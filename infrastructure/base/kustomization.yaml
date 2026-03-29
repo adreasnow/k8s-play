@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - capacitor-ks.yaml
   - cert-manager-ks.yaml
+  - cluster-issuer-ks.yaml
   - traefik-ks.yaml

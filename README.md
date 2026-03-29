@@ -108,7 +108,7 @@ flux bootstrap github \
 - To force flux to reconcile now:
 
 ```bash
-flux reconcile kustomization flux-system
+flux reconcile source git flux-system && flux reconcile kustomization flux-system
 ```
 
 ## Stopping

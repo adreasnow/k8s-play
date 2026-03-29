@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: guestbook
-  namespace: guestbook
+  name: demo
+  namespace: demo
   labels:
-    app: guestbook
+    app: demo
 spec:
   strategy:
     type: Recreate

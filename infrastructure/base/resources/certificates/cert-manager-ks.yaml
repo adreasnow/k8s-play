@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
+  timeout: 10m
   path: ./infrastructure/base/resources/certificates/cert-manager
   prune: true
   wait: true

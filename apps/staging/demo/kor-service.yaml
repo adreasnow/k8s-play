@@ -1,5 +1,5 @@
 apiVersion: kro.run/v1alpha1
-kind: Service
+kind: service
 metadata:
   name: demo-2
   namespace: demo

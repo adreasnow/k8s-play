@@ -1,5 +1,5 @@
 apiVersion: kro.run/v1alpha1
-kind: service
+kind: Service
 metadata:
   name: demo-2
   namespace: demo
@@ -9,7 +9,7 @@ spec:
   image: argoproj/rollouts-demo:purple
   hostname: demo.docker.localhost
   ports:
-    - containerPort: 8080
+    - port: 8080
       protocol: TCP
   resources:
     requests:

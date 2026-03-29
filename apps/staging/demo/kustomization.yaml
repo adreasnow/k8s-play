@@ -4,3 +4,4 @@ resources:
   - deployment.yaml
   - service.yaml
   - httpRoute.yaml
+  - kor-service.yaml

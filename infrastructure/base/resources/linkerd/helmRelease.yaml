@@ -14,8 +14,9 @@ spec:
         name: linkerd
         namespace: flux-system
       interval: 1h
+  targetNamespace: linkerd
   install:
-    createNamespace: false
+    createNamespace: true
   upgrade:
     cleanupOnFail: true
   values:

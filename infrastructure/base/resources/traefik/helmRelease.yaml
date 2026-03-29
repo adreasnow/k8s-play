@@ -14,8 +14,9 @@ spec:
         name: traefik
         namespace: flux-system
       interval: 1h
+    targetNamespace: traefik
   install:
-    createNamespace: false
+    createNamespace: true
   upgrade:
     cleanupOnFail: true
   values:
@@ -96,10 +97,10 @@ spec:
           namespacePolicy:
             from: All
           mode: Terminate
-          certificateRefs:
-            - kind: Secret
-              name: local-selfsigned-tls  # the Secret we created before the installation
-              group: ""
+          # certificateRefs:
+          #   - kind: Secret
+          #     name: local-selfsigned-tls  # the Secret we created before the installation
+          #     group: ""
 
     # Enable Observability
     logs:

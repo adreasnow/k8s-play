@@ -4,4 +4,4 @@ resources:
   - helmRepository.yaml
   - helmRelease.yaml
   - namespace.yaml
-  - certificate.yaml
+  # - certificate.yaml

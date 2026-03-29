@@ -23,7 +23,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - name: demo
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           resources:
             limits:

@@ -5,4 +5,4 @@ resources:
   - ../../infrastructure/base
   # - ../../infrastructure/staging
   # - ../../apps/base
-  # - ../../apps/staging
+  - ../../apps/staging

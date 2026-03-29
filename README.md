@@ -124,9 +124,7 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 minikube start \
   -p staging \
   --ports=80:30000 \
-  --ports=443:30001 \
-  --driver=docker \
-  '--addons=[dashboard]'
+  --ports=443:30001
 ```
 
 4. Bootstrap flux from current repo

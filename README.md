@@ -23,7 +23,9 @@ These are the tools used to manage the repository itself
 
 ## Layout
 
-FluxCD reads the resources from the `./clusters/<clustername>` directory but does not traverse through the tree. A top level `clusters/<clustername>/kustomization.yaml` file is used to specify all the appropriate manifest defintitons that are required for that cluster.
+FluxCD reads the resources from the `./clusters/<clustername>` directory but does not traverse through the tree. Flux always follows the directions of `kustomization.yaml`, and there must always be a kustomization.yaml in a directory for Flux to know what to apply.
+
+A top level `clusters/<clustername>/kustomization.yaml` file is used to specify all the appropriate manifest defintitons that are required for that cluster.
 
 The typical structure will look something like this, though `apps` is often swapped out for `teams` with a `CODEOWNERS.md`:
 

@@ -1,0 +1,97 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: Service
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: Service
+    spec:
+      name: string | required=true
+      replicas: integer | default=2
+      image: string | required=true
+      imagePullPolicy: string | default=Always
+      hostname: string | required=false
+      ports:
+        type: "[]object"
+        fields:
+          - name: port
+            type: integer
+            required: true
+          - name: protocol
+            type: string
+            required: true
+      resources:
+        limits:
+          cpu: string | required=true
+          memory: string | required=true
+        requests:
+          cpu: string | required=true
+          memory: string | required=true
+
+
+
+  resources:
+    - id: deployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              app: deployment
+          template:
+            metadata:
+              labels:
+                app: deployment
+            spec:
+              containers:
+                - name: ${schema.spec.name}-deployment
+                  image: ${schema.spec.image}
+                  imagePullPolicy: ${schema.spec.imagePullPolicy}
+                  ports:
+                    - ${schema.spec.ports}
+                  resources:
+                    limits:
+                      cpu: ${schema.spec.resources.limits.cpu}
+                      memory: ${schema.spec.resources.limits.memory}
+                    requests:
+                      cpu: ${schema.spec.resources.requests.cpu}
+                      memory: ${schema.spec.resources.requests.memory}
+    - id: service
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          selector:
+            app: deployment
+          ports:
+            - ${schema.spec.ports}
+
+    - id: httpRoute
+      includeWhen:
+        - ${schema.spec.hostname}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          parentRefs:
+            - name: traefik-gateway
+              namespace: traefik
+          hostnames:
+            - ${schema.spec.hostname}
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: /
+              backendRefs:
+                - name: ${schema.spec.name}
+                  port: ${schema.spec.ports[0].port}

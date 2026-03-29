@@ -5,3 +5,4 @@ resources:
   - cluster-issuer-ks.yaml
   - kro-ks.yaml
   - traefik-ks.yaml
+  - kro-definitions

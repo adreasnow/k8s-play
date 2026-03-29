@@ -1,0 +1,17 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kro-definitions
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 10m
+  retryInterval: 1m
+  path: ./infrastructure/base/resources/kro-definitions
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: kro

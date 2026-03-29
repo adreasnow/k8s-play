@@ -52,15 +52,15 @@ These are the tools used to manage the repository itself
 - [ ] Gateway API CRDs
 - [ ] AWS ASCP
 - [ ] Secrets Store CSI driver
-- [ ] KEDS
+- [ ] KEDA
 - [ ] OTEL Colelctor driver
   - [ ] Node level collector
   - [ ] Cluster level collector
-- [ ]
 
 ## Productionising Alternatives
 
 - Install Flux via tofu with github app rather than cli bootstrap ([example](https://github.com/controlplaneio-fluxcd/flux-operator/blob/main/config/terraform/main.tf))
+- Traefik to self-geenrate certs with certbot
 
 ## Layout
 

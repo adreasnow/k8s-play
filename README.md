@@ -40,9 +40,9 @@ These are the tools used to manage the repository itself
 - [x] FluxCD
 - [ ] Capacitor - Provides a dashboard for FluxCD
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
-- [x] [traefik-proxy](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
+- [x] [traefik](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
 - [ ] ExternalDNS?
-- [ ] [traefik-mesh](https://doc.traefik.io/traefik-mesh/) - Lightweight service mesh for mTLS
+- [ ] Linkerd2 service mesh ()
 - [ ] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
   - [ ] Namespace KR
   - [ ] App KR
@@ -57,6 +57,10 @@ These are the tools used to manage the repository itself
   - [ ] Node level collector
   - [ ] Cluster level collector
 - [ ]
+
+## Productionising Alternatives
+
+- Install Flux via tofu with github app rather than cli bootstrap ([example](https://github.com/controlplaneio-fluxcd/flux-operator/blob/main/config/terraform/main.tf))
 
 ## Layout
 
@@ -166,7 +170,3 @@ To destroy the cluster:
 ```bash
 minikube delete -p k8s-play
 ```
-
-## Productionising
-
-- Install Flux via tofu with github app rather than cli bootstrap ([example](https://github.com/controlplaneio-fluxcd/flux-operator/blob/main/config/terraform/main.tf))

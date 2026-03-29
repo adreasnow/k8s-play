@@ -16,7 +16,7 @@ spec:
       interval: 1h
   targetNamespace: traefik
   install:
-    createNamespace: true
+    createNamespace: false
   upgrade:
     cleanupOnFail: true
   values:
@@ -97,11 +97,10 @@ spec:
           namespacePolicy:
             from: All
           mode: Terminate
-          tls: {}
-          # certificateRefs:
-          #   - kind: Secret
-          #     name: local-selfsigned-tls  # the Secret we created before the installation
-          #     group: ""
+          certificateRefs:
+            - kind: Secret
+              name: local-selfsigned-tls  # the Secret we created before the installation
+              group: ""
 
     # Enable Observability
     logs:

@@ -10,7 +10,7 @@ spec:
   timeout: 5m
   wait: true
   prune: true
-  path: ./infrastructure/base/resources/capacitor
+  path: "./"
   sourceRef:
     kind: OCIRepository
     name: capacitor

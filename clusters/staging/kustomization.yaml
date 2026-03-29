@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - flux-system
   - ../../infrastructure/base
-  # - ../../infrastructure/staging
+  - ../../infrastructure/staging
   # - ../../apps/base
   - ../../apps/staging

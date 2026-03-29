@@ -8,6 +8,11 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 - [FluxCD](https://fluxcd.io/) - Lightweight, stateless, self-managed GitOps tool for k8s
 - [gh](https://cli.github.com) - Used for authenticating with GitHub
 
+### Reccomendations
+
+- [k9s](https://k9scli.io) - TUI for exploring/managing k8s resources
+- [flux9s](https://github.com/dgunzy/flux9s) - TUI or exploring/managing the status of FluxCD in a k9s way
+
 ## Base Tools used
 
 These are the tools used to manage the repository itself

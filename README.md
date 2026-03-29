@@ -21,10 +21,18 @@ These are the tools used to manage the repository itself
 - [Kutstomize](https://kustomize.io) - Tool that allows you modify k8s manifest files by creating amendments to the base defintions
 - [Helm](https://helm.sh) - Package manager for k8s that builds upon the idea of templating values
 
+## Services exposed
+
+- Demo app at https://demo.docker.localhost
+
 ## Components
 
-- [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
-- [traefik-proxy]()
+- [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
+- [x] [traefik-proxy](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
+  - Dasboard at https://dashboard.docker.localhost
+- [ ] [traefik-mesh](https://doc.traefik.io/traefik-mesh/) - Lightweight service mesh for mTLS
+- [ ] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
+- [ ]
 
 ## Layout
 

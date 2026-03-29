@@ -59,29 +59,30 @@ Each resource that comes from a helm repository is defined in three steps:
 
 ### Ordering
 
-Any resource that's defined in `clusters/play-cluster/kustomization.yaml` will automatically be applied at the same timem however many resources are dependent and need to be applied in order.
+Any resource that's defined in `clusters/<clustername>/kustomization.yaml` will automatically be applied at the same time however many resources are dependent and need to be applied in order.
 
-To accomplish this we use use the `kustomize.toolkit.fluxcd.io/v1` `Kustomization` object which is defined in `clusters/play-cluster/infrastructure` to create a dependency chain. This directory is included in the top-level kustomization to ensure it's included in the chain, but the resources inside of it are not.
+To accomplish this instead of referencing it in a kustomization's `resources` use use the `kustomize.toolkit.fluxcd.io/v1` `Kustomization` object to create a dependency chain, by defining a directory as a named fluxcd `Kustomization` with `wait=true`, and create another with a depends-on.
 
-e.g. we can't create certificates with cert-manager until cert manager is installed so we:
+e.g. traefik depends on having certs which depdnends on there being a cluster issuer, which depends on cert-manager being installed, so in the `infrastructure/base` directory we:
 
-1. Create a CR for `clusters/play-cluster/cert-manager` in `clusters/play-cluster/infrastructure/cert-manager-ks.yaml` that allows us to reference it by name and wait until it's healthy.
-2. Create a CR for `clusters/play-cluster/cert-manager-config` in `clusters/play-cluster/infrastructure/cert-manager-config-ks.yaml` that waits for `cert-manager` to be ready before creating our required certificates
+1. Reference the `certificates` directory in the top level `kustomization.yaml`
+2. Create `resources/certificates/cert-manager-ks.yaml` which applies `resources/certificates/cert-manager`
+3. Create `resources/certificates/cluster-issuer.yaml` which waits for `cert-manager` before applying `resources/certificates/cluster-issuer.yaml`
+4. Create `resources/certificates/traefik-cert-ks.yaml` which waits for `cluster-issuer` before applying `resources/certificates/traefik-cert`
+5. Create a top level `traefik-ks.yaml` which waits for `traefik-cert` before applying `resources/traefik`
 
 ## Getting Started
 
 1. Fork this repo into your gh account
 2. Ensure that you're logged into gh cli with said account
-
 3. Create minikube cluster
 
 ```bash
 minikube start \
   -p k8s-play \
-  --ha=true \
-  --nodes 3 \
   --ports=80:30000 \
   --ports=443:30001 \
+  --driver=docker \
   '--addons=[dashboard]'
 ```
 

@@ -1,18 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespaces
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: namespaces
-  namespace: flux-system
-spec:
-  interval: 10m
-  path: ./infrastructure/staging/namespaces
-  prune: true
-  wait: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
+  - namespaces.yaml

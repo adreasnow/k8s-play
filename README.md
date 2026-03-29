@@ -79,7 +79,7 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 
 ```bash
 minikube start \
-  -p k8s-play \
+  -p staging \
   --ports=80:30000 \
   --ports=443:30001 \
   --driver=docker \
@@ -98,6 +98,12 @@ flux bootstrap github \
   --personal
 ```
 
+- To force flux to reconcile now:
+
+```bash
+flux reconcile kustomization flux-system
+```
+
 ## Stopping
 
 To stop the cluster:
@@ -111,3 +117,7 @@ To destroy the cluster:
 ```bash
 minikube delete -p k8s-play
 ```
+
+## Productionising
+
+- Install Flux via tofu with github app rather than cli bootstrap ([example](https://github.com/controlplaneio-fluxcd/flux-operator/blob/main/config/terraform/main.tf))

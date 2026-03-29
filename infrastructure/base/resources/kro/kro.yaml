@@ -14,5 +14,3 @@ spec:
   sourceRef:
     kind: OCIRepository
     name: kro
-  install:
-    createNamespace: true

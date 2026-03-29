@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - kro.yaml
   - ociRepository.yaml
-  - namespace.yaml

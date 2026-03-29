@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - cert-manager-ks.yaml
   - cluster-issuer.yaml
-  - traefik-cert-ks.yaml
+  - traefik-proxy-cert-ks.yaml

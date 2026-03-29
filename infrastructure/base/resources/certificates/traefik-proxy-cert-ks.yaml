@@ -1,13 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: traefik-cert
+  name: traefik-proxy-cert
   namespace: flux-system
 spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./infrastructure/base/resources/certificates/traefik-cert
+  path: ./infrastructure/base/resources/certificates/traefik-proxy-cert
   prune: true
   wait: true
   sourceRef:

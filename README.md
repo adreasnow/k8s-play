@@ -24,18 +24,38 @@ These are the tools used to manage the repository itself
 
 ## Services exposed
 
-- Demo app at https://demo.docker.localhost
+- Demo app - https://demo.docker.localhost
+- Capacitor - https://capacitor.docker.localhost
+- Traefik dasboard - https://dashboard.docker.localhost
+
+## Other TODO
+
+- [ ] Compare FluxCD with ArgoCD
+- [ ] EKS via tofu
+- [ ] AWS resource definitons
+  - [ ] Maybe we could create IAM roles from within the KRO definition?
 
 ## Components
 
 - [x] FluxCD
 - [ ] Capacitor - Provides a dashboard for FluxCD
-  - https://capacitor.docker.localhost
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
 - [x] [traefik-proxy](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
-  - Dasboard at https://dashboard.docker.localhost
+- [ ] ExternalDNS?
 - [ ] [traefik-mesh](https://doc.traefik.io/traefik-mesh/) - Lightweight service mesh for mTLS
 - [ ] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
+  - [ ] Namespace KR
+  - [ ] App KR
+  - [ ] Cron KR
+- [ ] Traefik Gateway API CRDs?
+- [ ] Gateway/GatewayClass Definitions
+- [ ] Gateway API CRDs
+- [ ] AWS ASCP
+- [ ] Secrets Store CSI driver
+- [ ] KEDS
+- [ ] OTEL Colelctor driver
+  - [ ] Node level collector
+  - [ ] Cluster level collector
 - [ ]
 
 ## Layout

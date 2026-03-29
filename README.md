@@ -38,7 +38,6 @@ These are the tools used to manage the repository itself
 ## Components
 
 - [x] FluxCD
-- [ ] Capacitor - Provides a dashboard for FluxCD
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
 - [x] [traefik](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
 - [ ] ExternalDNS?

@@ -7,7 +7,7 @@ spec:
   name: demo-2
   replicas: 2
   image: argoproj/rollouts-demo:purple
-  hostname: demo.docker.localhost
+  hostname: demo-2.docker.localhost
   ports:
     - port: 8080
       protocol: TCP

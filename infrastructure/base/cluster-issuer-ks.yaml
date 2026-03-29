@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 10m
   timeout: 10m
-  path: ./infrastructure/base/resources/cluster-
+  path: ./infrastructure/base/resources/cluster-issuer
   prune: true
   wait: true
   sourceRef:

@@ -6,21 +6,17 @@ spec:
   schema:
     apiVersion: v1alpha1
     kind: Service
+    types:
+      Port:
+        port: integer | required=true
+        protocol: string | required=true
     spec:
       name: string | required=true
       replicas: integer | default=2
       image: string | required=true
       imagePullPolicy: string | default=Always
       hostname: string | required=false
-      ports:
-        type: "[]object"
-        fields:
-          - name: port
-            type: integer
-            required: true
-          - name: protocol
-            type: string
-            required: true
+      ports: "[]Port"
       resources:
         limits:
           cpu: string | required=true

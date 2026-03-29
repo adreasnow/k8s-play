@@ -1,8 +1,8 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: traefik-mesh
-  namespace: traefik-mesh
+  name: traefik
+  namespace: traefik
 spec:
   interval: 10m
   chart:
@@ -15,7 +15,7 @@ spec:
         namespace: flux-system
       interval: 1h
   install:
-    createNamespace: true
+    createNamespace: false
   upgrade:
     cleanupOnFail: true
   values:

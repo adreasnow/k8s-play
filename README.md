@@ -12,6 +12,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 
 - [k9s](https://k9scli.io) - TUI for exploring/managing k8s resources
 - [flux9s](https://github.com/dgunzy/flux9s) - TUI or exploring/managing the status of FluxCD in a k9s way
+- [kubeconform](https://github.com/yannh/kubeconform) - validates that the
 
 ## Base Tools used
 
@@ -125,7 +126,11 @@ flux reconcile source git flux-system && flux reconcile kustomization flux-syste
 - To validate that kustomize can build flux
 
 ```bash
-kubectl kustomize clusters/staging
+kubectl kustomize clusters/staging | kubeconform -strict -summary \
+  -kubernetes-version 1.31.0 \
+  -schema-location default \
+  -skip CustomResourceDefinition \
+  -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
 ```
 
 ## Stopping

@@ -14,7 +14,6 @@ spec:
         name: traefik
         namespace: flux-system
       interval: 1h
-  targetNamespace: traefik
   install:
     createNamespace: false
   upgrade:

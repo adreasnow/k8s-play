@@ -16,5 +16,3 @@ spec:
     name: kro
   install:
     createNamespace: true
-  upgrade:
-    cleanupOnFail: true

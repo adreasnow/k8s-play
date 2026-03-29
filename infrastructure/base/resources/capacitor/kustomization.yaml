@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - capacitor.yaml
   - httpRoute.yaml
+  - ociRepository.yaml

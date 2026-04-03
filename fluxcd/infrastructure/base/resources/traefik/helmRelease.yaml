@@ -17,8 +17,10 @@ spec:
   targetNamespace: traefik
   install:
     createNamespace: false
+    # crds: Skip
   upgrade:
     cleanupOnFail: true
+    # crds: Skip
   values:
     # Configure Network Ports and EntryPoints
     # EntryPoints are the network listeners for incoming traffic.

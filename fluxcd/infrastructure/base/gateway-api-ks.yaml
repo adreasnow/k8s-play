@@ -8,7 +8,7 @@ spec:
   timeout: 10m
   retryInterval: 1m
   path: ./fluxcd/infrastructure/base/resources/gateway-api
-  prune: false
+  prune: true
   wait: true
   force: true
   sourceRef:

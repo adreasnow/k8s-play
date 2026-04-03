@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - cert-manager-ks.yaml
   - cluster-issuer-ks.yaml
-  - gateway-api-ks.yaml
+  # - gateway-api-ks.yaml
   - kro-definitions.yaml
   - kro-ks.yaml
   - namespaces-ks.yaml

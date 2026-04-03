@@ -30,6 +30,11 @@ spec:
       deps: [cluster-issuer, namespaces-base]
       useClusterVars: true
 
+    - name: flux-operator-dashboard
+      path: ./fluxcd/infrastructure/base/resources/flux-operator-dashboard
+      deps: [traefik]
+      useClusterVars: true
+
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1

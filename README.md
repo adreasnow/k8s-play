@@ -31,6 +31,7 @@ These are the tools used to manage the repository itself
 - Demo app - https://demo.k8s.orb.local
 - Capacitor - https://capacitor.k8s.orb.local
 - Traefik dasboard - https://dashboard.k8s.orb.local
+- Flux-Operator Dashboard - http://flux-operator.flux-system.svc.cluster.local:9080
 
 ## Other TODO
 

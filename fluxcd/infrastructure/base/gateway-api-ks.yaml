@@ -1,0 +1,16 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: gateway-api
+  namespace: flux-system
+spec:
+  interval: 10m
+  timeout: 10m
+  retryInterval: 1m
+  path: ./fluxcd/infrastructure/base/resources/gateway-api
+  prune: false
+  wait: true
+  force: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

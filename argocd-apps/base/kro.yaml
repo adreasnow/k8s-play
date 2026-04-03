@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kro
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  project: infrastructure
+  sources:
+    - repoURL: registry.k8s.io/kro/charts
+      chart: kro
+      targetRevision: 0.9.0
+      helm:
+        valueFiles:
+          - $values/argocd-apps/infrastructure/kro/values.yaml
+    - repoURL: https://github.com/adreasnow/k8s-play.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kro-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2

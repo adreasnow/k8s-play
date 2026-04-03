@@ -15,6 +15,8 @@ Domain = `k8s.orb.local`
 - Start - `orb start k8s`
 - Stop - `orb stop k8s`
 - Destroy - `orb delete k8s -a`
+- Reset OrbStack - `orb reset`
+  - This will purge all contianers, caches, volumes etc. from orbstack. Not jsut K8s.
 
 ## [Minikube](https://minikube.sigs.k8s.io/docs/)
 

@@ -19,7 +19,7 @@ spec:
         interval: 10m
         retryInterval: 1m
         path: << inputs.path >>
-        prune: << get inputs "prune" | default "true" >>
+        prune: true
         wait: true
         sourceRef:
           kind: GitRepository

@@ -7,7 +7,7 @@ metadata:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
   inputs:
-    - name: namespaces
+    - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces
 
     - name: cert-manager
@@ -31,7 +31,7 @@ spec:
 
     - name: traefik
       path: ./fluxcd/infrastructure/base/resources/traefik
-      deps: [cluster-issuer, gateway-api, namespaces]
+      deps: [cluster-issuer, gateway-api, namespaces-base]
       useClusterVars: true
 
   resourcesTemplate: |

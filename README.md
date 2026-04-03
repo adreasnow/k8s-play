@@ -28,9 +28,9 @@ These are the tools used to manage the repository itself
 
 ## Services exposed
 
-- Demo app - https://demo.docker.localhost
-- Capacitor - https://capacitor.docker.localhost
-- Traefik dasboard - https://dashboard.docker.localhost
+- Demo app - https://demo.k8s.orb.local
+- Capacitor - https://capacitor.k8s.orb.local
+- Traefik dasboard - https://dashboard.k8s.orb.local
 
 ## Other TODO
 
@@ -125,7 +125,7 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 2. Ensure that you're logged into gh cli with said account
 3. Create minikube cluster
    - Minikube - `minikube start -p staging --ports=80:30000 --ports=443:30001`
-     - If using minikube, you will also need to change the certificate domain in infrastructure/base/resources/traefik/certificate.yaml to `docker.localhost`
+     - If using minikube, you will also need to change the certificate domain in infrastructure/base/resources/traefik/certificate.yaml to `k8s.orb.local`
    - OrbStack - `orb start k8s`
 4. Bootstrap flux from current repo
 

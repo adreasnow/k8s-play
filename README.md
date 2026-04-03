@@ -125,7 +125,7 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 2. Ensure that you're logged into gh cli with said account
 3. Create minikube cluster
    - Minikube - `minikube start -p staging --ports=80:30000 --ports=443:30001`
-     - If using minikube, you will also need to change the certificate domain in infrastructure/base/resources/traefik/certificate.yaml to `k8s.orb.local`
+     - If using minikube, you will also need to change the domain [infrastructure/staging/cluster-vars.yaml](.infrastructure/staging/cluster-vars.yaml) to `docker.localhost`
    - OrbStack - `orb start k8s`
 4. Bootstrap flux from current repo
 

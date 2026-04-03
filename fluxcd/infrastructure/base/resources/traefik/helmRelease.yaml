@@ -81,6 +81,7 @@ spec:
         enabled: false
       kubernetesGateway:
         enabled: true
+        nativeLBByDefault: true # Use native load balancer for Gateway listeners to keep traffic local
 
     ## Gateway Listeners
     gateway:

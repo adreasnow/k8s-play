@@ -1,4 +1,15 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - demo.yaml
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: namespaces
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcileEvery: 1h
+spec:
+  inputs:
+    - name: demo
+  resources:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: << inputs.name >>

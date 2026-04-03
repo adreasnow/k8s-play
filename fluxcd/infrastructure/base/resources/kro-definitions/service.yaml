@@ -61,6 +61,7 @@ spec:
         metadata:
           name: $${schema.spec.name}
         spec:
+          trafficDistribution: PreferClose # Prefer same AZ/same node endpoints
           selector:
             app: deployment
           ports: $${schema.spec.ports}

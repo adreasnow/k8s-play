@@ -7,8 +7,8 @@ metadata:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
   inputs:
-    name: namespaces
-    path: ./fluxcd/infrastructure/base/namespaces
+    - name: namespaces
+      path: ./fluxcd/infrastructure/base/namespaces
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1

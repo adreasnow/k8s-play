@@ -15,6 +15,7 @@ spec:
     name: flux-system
   dependsOn:
     - name: cluster-issuer
+    - name: gateway-api
     - name: namespaces
   postBuild:
     substituteFrom:

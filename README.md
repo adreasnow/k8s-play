@@ -44,6 +44,7 @@ These are the tools used to manage the repository itself
 - [x] FluxCD
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
 - [x] [traefik](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
+- [ ] [Gateway API CRDs](https://gateway-api.sigs.k8s.io) - CRDs that enable the use of the Gateway API
 - [x] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
   - [ ] App KR
     - TODO: test this

@@ -1,0 +1,67 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: infrastructure
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcileEvery: "1h"
+spec:
+  inputs:
+    - name: namespaces
+      path: ./flux-operator/infrastructure/production/namespaces
+    - name: cert-manager
+      path: ./flux-operator/infrastructure/base/resources/cert-manager
+      timeout: "10m"
+    - name: cluster-issuer
+      path: ./flux-operator/infrastructure/base/resources/cluster-issuer
+      timeout: "10m"
+      deps: "cert-manager"
+    - name: gateway-api
+      path: ./flux-operator/infrastructure/base/resources/gateway-api
+      prune: "false"
+      force: "true"
+    - name: kro
+      path: ./flux-operator/infrastructure/base/resources/kro
+      deps: "namespaces"
+    - name: kro-definitions
+      path: ./flux-operator/infrastructure/base/resources/kro-definitions
+      deps: "kro,gateway-api"
+      usePostBuild: "true"
+    - name: traefik
+      path: ./flux-operator/infrastructure/base/resources/traefik
+      deps: "cluster-issuer,gateway-api,namespaces"
+      usePostBuild: "true"
+  resourcesTemplate: |
+    ---
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: << inputs.name >>
+      namespace: flux-system
+    spec:
+      interval: 10m
+      << if get inputs "timeout" ->>
+      timeout: << inputs.timeout >>
+      << end ->>
+      retryInterval: 1m
+      path: << inputs.path >>
+      prune: << get inputs "prune" | default "true" >>
+      << if get inputs "force" ->>
+      force: << inputs.force >>
+      << end ->>
+      wait: true
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+      << if get inputs "deps" ->>
+      dependsOn:
+        << range $dep := splitList "," (get inputs "deps") ->>
+        - name: << $dep | trim >>
+        << end ->>
+      << end ->>
+      << if eq (get inputs "usePostBuild" | default "false") "true" ->>
+      postBuild:
+        substituteFrom:
+          - kind: ConfigMap
+            name: cluster-vars
+      << end ->>

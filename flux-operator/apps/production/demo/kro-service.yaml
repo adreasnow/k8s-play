@@ -1,0 +1,20 @@
+apiVersion: kro.run/v1alpha1
+kind: Service
+metadata:
+  name: demo
+  namespace: demo
+spec:
+  name: demo
+  replicas: 2
+  image: argoproj/rollouts-demo:purple
+  hostname: demo.${DOMAIN}
+  ports:
+    - port: 8080
+      protocol: TCP
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

@@ -1,0 +1,38 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: apps
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcileEvery: "1h"
+spec:
+  dependsOn:
+    - apiVersion: fluxcd.controlplane.io/v1
+      kind: ResourceSet
+      name: infrastructure
+      namespace: flux-system
+      ready: true
+  inputs:
+    - name: demo
+      path: ./flux-operator/apps/production/demo
+      namespace: demo
+  resources:
+    - apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: << inputs.name >>
+        namespace: flux-system
+      spec:
+        interval: 10m
+        path: << inputs.path >>
+        prune: true
+        wait: true
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+        dependsOn:
+          - name: namespaces
+        postBuild:
+          substituteFrom:
+            - kind: ConfigMap
+              name: cluster-vars

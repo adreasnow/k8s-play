@@ -8,7 +8,7 @@ spec:
     - name: traefik-gateway
       namespace: traefik
   hostnames:
-    - "demo.k8s.orb.local"
+    - "demo.${DOMAIN}"
   rules:
     - matches:
         - path:

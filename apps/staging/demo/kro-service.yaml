@@ -7,7 +7,7 @@ spec:
   name: demo
   replicas: 2
   image: argoproj/rollouts-demo:purple
-  hostname: demo.k8s.orb.local
+  hostname: demo.${DOMAIN}
   ports:
     - port: 8080
       protocol: TCP

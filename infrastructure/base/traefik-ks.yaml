@@ -16,3 +16,7 @@ spec:
   dependsOn:
     - name: cluster-issuer
     - name: namespaces
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-vars

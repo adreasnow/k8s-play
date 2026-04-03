@@ -57,7 +57,7 @@ spec:
         - name: << $dep | trim >>
         << end ->>
       << end ->>
-      << if eq (get inputs "usePostBuild" | default "false") "true" ->>
+      << if get inputs "usePostBuild" ->>
       postBuild:
         substituteFrom:
           - kind: ConfigMap

@@ -5,7 +5,7 @@ metadata:
 spec:
   parentRefs:
     - name: traefik-gateway
-      namespace: traefik
+      namespace: flux-system
   hostnames:
     - flux-operator.${DOMAIN}
   rules:

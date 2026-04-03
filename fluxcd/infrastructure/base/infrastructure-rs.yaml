@@ -17,9 +17,9 @@ spec:
       path: ./fluxcd/infrastructure/base/resources/cluster-issuer
       deps: [cert-manager]
 
-    - name: gateway-api
-      path: ./fluxcd/infrastructure/base/resources/gateway-api
-      force: true
+    # - name: gateway-api
+    #   path: ./fluxcd/infrastructure/base/resources/gateway-api
+    #   force: true
 
     - name: kro
       path: ./fluxcd/infrastructure/base/resources/kro

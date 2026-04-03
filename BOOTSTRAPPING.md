@@ -1,5 +1,13 @@
 # Bootstrapping
 
+## Updating
+
+Run renovate with docker
+
+```bash
+docker run --rm -e RENOVATE_REPOSITORIES=adreasnow/k8s-play renovate/renovate --token $(gh auth token)
+```
+
 ## FluxCD
 
 1. Create a k8s CLuster

@@ -46,8 +46,7 @@ spec:
                 - name: $${schema.spec.name}-deployment
                   image: $${schema.spec.image}
                   imagePullPolicy: $${schema.spec.imagePullPolicy}
-                  ports:
-                    - $${schema.spec.ports}
+                  ports: '$${schema.spec.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
                   resources:
                     limits:
                       cpu: $${schema.spec.resources.limits.cpu}
@@ -64,8 +63,7 @@ spec:
         spec:
           selector:
             app: deployment
-          ports:
-            - $${schema.spec.ports}
+          ports: $${schema.spec.ports}
 
     - id: httpRoute
       includeWhen:

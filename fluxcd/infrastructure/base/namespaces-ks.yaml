@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: namespaces
+  name: namespaces-base
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./fluxcd/infrastructure/staging/namespaces
+  path: ./fluxcd/infrastructure/base/namespaces
   prune: true
   wait: true
   sourceRef:

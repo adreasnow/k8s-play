@@ -1,17 +1,17 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infrastructure
+  name: apps
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./fluxcd/infrastructure/${CLUSTER}
+  timeout: 10m
+  retryInterval: 1m
+  path: ./fluxcd/apps/staging
   prune: true
   wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  postBuild:
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars
+  dependsOn:
+    - name: infrastructure

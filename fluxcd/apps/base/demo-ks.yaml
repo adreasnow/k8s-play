@@ -5,12 +5,9 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./fluxcd/apps/staging/demo
+  path: ./fluxcd/apps/base/demo
   prune: true
   wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  dependsOn:
-    - name: namespaces
-      namespace: flux-system

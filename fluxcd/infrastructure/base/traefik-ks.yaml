@@ -16,7 +16,7 @@ spec:
   dependsOn:
     - name: cluster-issuer
     - name: gateway-api
-    - name: namespaces
+    - name: namespaces-base
   postBuild:
     substituteFrom:
       - kind: ConfigMap

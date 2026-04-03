@@ -9,30 +9,31 @@ spec:
   inputs:
     - name: namespaces
       path: ./fluxcd/infrastructure/base/namespaces
+
     - name: cert-manager
       path: ./fluxcd/infrastructure/base/resources/cert-manager
+
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/base/resources/cluster-issuer
-      deps:
-        - cert-manager
+      deps: [cert-manager]
+
     - name: gateway-api
       path: ./fluxcd/infrastructure/base/resources/gateway-api
       force: true
+
     - name: kro
       path: ./fluxcd/infrastructure/base/resources/kro
+
     - name: kro-definitions
       path: ./fluxcd/infrastructure/base/resources/kro-definitions
-      deps:
-        - kro
-        - gateway-api
-      usePostBuild: true
+      deps: [kro, gateway-api]
+      useClusterVars: true
+
     - name: traefik
       path: ./fluxcd/infrastructure/base/resources/traefik
-      deps:
-        - cluster-issuer
-        - gateway-api
-        - namespaces
-      usePostBuild: true
+      deps: [cluster-issuer, gateway-api, namespaces]
+      useClusterVars: true
+
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -57,7 +58,7 @@ spec:
         - name: << $dep >>
       <<- end >>
     <<- end >>
-    <<- if get inputs "usePostBuild" >>
+    <<- if get inputs "useClusterVars" >>
       postBuild:
         substituteFrom:
           - kind: ConfigMap

@@ -5,6 +5,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 ## Tool Requirements
 
 - [Minikube](https://minikube.sigs.k8s.io/docs/) - Allows you to create local k8s clusters in docker
+  - Requires a container runtime such as containerd, CRI-O, orbstack, or Docker
 - [FluxCD](https://fluxcd.io/) - Lightweight, stateless, self-managed GitOps tool for k8s
 - [gh](https://cli.github.com) - Used for authenticating with GitHub
 

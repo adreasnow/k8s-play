@@ -1,0 +1,53 @@
+# Common Management tasks
+
+For most things you'll want to just use
+
+- `k9s` to view the contents/status of cluster resources
+- `flux9s` to view the status of Flux and it's recinciliation.
+
+Below are some other helpful commands and tools for debugging what's going on.
+
+## To force flux to reconcile
+
+```bash
+flux reconcile source git flux-system && flux reconcile kustomization flux-system
+```
+
+## Diff your changes against main
+
+```bash
+flux diff kustomization flux-system --path=./fluxcd/clusters/staging
+```
+
+## Build the whole k8s manifest
+
+```bash
+flux build kustomization flux-system --path=./fluxcd/clusters/staging
+```
+
+## Check Status
+
+```bash
+kubectl get fluxinstance -n flux-system
+kubectl get fluxreport -n flux-system -o yaml
+kubectl get resourcesets -n flux-system
+kubectl get kustomizations -n flux-system
+```
+
+## Access the Web UI
+
+This is also exposed at `flux-operator.k8s.orb.local`
+
+```bash
+kubectl -n flux-system port-forward svc/flux-operator 9080:9080
+```
+
+## To validate that kustomize can build flux
+
+```bash
+kubectl kustomize clusters/staging | kubeconform -strict -summary \
+  -kubernetes-version 1.31.0 \
+  -schema-location default \
+  -skip CustomResourceDefinition \
+  -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+```

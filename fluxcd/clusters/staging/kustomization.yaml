@@ -3,7 +3,4 @@ kind: Kustomization
 resources:
   - flux-system
   - cluster-vars
-  - ../../infrastructure/base
-  - ../../infrastructure/staging
-  # - ../../apps/base
-  - ../../apps/staging
+  - base-ks.yaml

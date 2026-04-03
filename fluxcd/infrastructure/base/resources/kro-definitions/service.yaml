@@ -78,7 +78,7 @@ spec:
             - name: traefik-gateway
               namespace: traefik
           hostnames:
-            - $${schema.spec.hostname}
+            - $${schema.spec.hostname}.${DOMAIN}
           rules:
             - matches:
                 - path:

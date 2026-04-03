@@ -5,3 +5,4 @@ metadata:
   namespace: flux-system
 data:
   DOMAIN: k8s.orb.local
+  CLUSTER: staging

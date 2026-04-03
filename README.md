@@ -133,9 +133,9 @@ minikube start \
 
 ```bash
 flux bootstrap github \
-  --owner="$(gh api user --jq '.login')" \
-  --repository=k8s-play \
-  --branch=main \
+  --owner="$(gh repo view --json owner -q '.owner.login')" \
+  --repository=$(gh repo view --json name -q '.name') \
+  --branch=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name') \
   --path=./clusters/staging \
   --interval=30s \
   --personal

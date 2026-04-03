@@ -42,7 +42,7 @@ spec:
       namespace: flux-system
     spec:
       interval: 10m
-      timeout: << inputs.timeout | default "10m" >>
+      timeout: 10m
       retryInterval: 1m
       path: << inputs.path >>
       prune: << get inputs "prune" | default "true" >>

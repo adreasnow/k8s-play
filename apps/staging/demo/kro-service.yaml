@@ -1,13 +1,13 @@
 apiVersion: kro.run/v1alpha1
 kind: Service
 metadata:
-  name: demo-2
+  name: demo
   namespace: demo
 spec:
-  name: demo-2
+  name: demo
   replicas: 2
   image: argoproj/rollouts-demo:purple
-  hostname: demo-2.docker.localhost
+  hostname: demo.k8s.orb.local
   ports:
     - port: 8080
       protocol: TCP

@@ -4,10 +4,13 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 
 ## Tool Requirements
 
-- [Minikube](https://minikube.sigs.k8s.io/docs/) - Allows you to create local k8s clusters in docker
-  - Requires a container runtime such as containerd, CRI-O, orbstack, or Docker
 - [FluxCD](https://fluxcd.io/) - Lightweight, stateless, self-managed GitOps tool for k8s
 - [gh](https://cli.github.com) - Used for authenticating with GitHub
+- Local k8s cluster
+  - [orbstack](https://orbstack.dev) - Better, faster, lighter, less corporate docker-compatible container runtime thatn Docker
+  - [Minikube](https://minikube.sigs.k8s.io/docs/) - Allows you to create local k8s clusters in docker
+    - Requires a container runtime such as containerd, CRI-O, orbstack, or Docker
+  - Another cluster of your choosing such as kind, k3s, or Docker
 
 ### Reccomendations
 
@@ -121,14 +124,9 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 1. Fork this repo into your gh account
 2. Ensure that you're logged into gh cli with said account
 3. Create minikube cluster
-
-```bash
-minikube start \
-  -p staging \
-  --ports=80:30000 \
-  --ports=443:30001
-```
-
+   - Minikube - `minikube start -p staging --ports=80:30000 --ports=443:30001`
+     - If using minikube, you will also need to change the certificate domain in infrastructure/base/resources/traefik/certificate.yaml to `docker.localhost`
+   - OrbStack - `orb start k8s`
 4. Bootstrap flux from current repo
 
 ```bash
@@ -161,12 +159,10 @@ kubectl kustomize clusters/staging | kubeconform -strict -summary \
 
 To stop the cluster:
 
-```bash
-minikube stop -p k8s-play
-```
+- Minikube - `minikube stop -p k8s-play`
+- OrbStack - `orb stop k8s`
 
 To destroy the cluster:
 
-```bash
-minikube delete -p k8s-play
-```
+- Minikube - `minikube delete -p k8s-play`
+- OrbStack - `orb delete k8s -fa`

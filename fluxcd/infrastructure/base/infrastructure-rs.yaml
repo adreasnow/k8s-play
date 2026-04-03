@@ -22,13 +22,11 @@ spec:
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/base/resources/kro-definitions
-      # deps: [kro, gateway-api]
       deps: [kro]
       useClusterVars: true
 
     - name: traefik
       path: ./fluxcd/infrastructure/base/resources/traefik
-      # deps: [cluster-issuer, gateway-api, namespaces-base]
       deps: [cluster-issuer, namespaces-base]
       useClusterVars: true
 

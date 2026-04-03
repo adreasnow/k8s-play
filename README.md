@@ -120,50 +120,10 @@ e.g. traefik depends on having certs which depdnends on there being a cluster is
 4. Create `resources/certificates/traefik-cert-ks.yaml` which waits for `cluster-issuer` before applying `resources/certificates/traefik-cert`
 5. Create a top level `traefik-ks.yaml` which waits for `traefik-cert` before applying `resources/traefik`
 
-## Getting Started
+## Creating a local K8s cluster
 
-1. Fork this repo into your gh account
-2. Ensure that you're logged into gh cli with said account
-3. Create minikube cluster
-   - Minikube - `minikube start -p staging --ports=80:30000 --ports=443:30001`
-     - If using minikube, you will also need to change the domain [infrastructure/staging/cluster-vars.yaml](.infrastructure/staging/cluster-vars.yaml) to `docker.localhost`
-   - OrbStack - `orb start k8s`
-4. Bootstrap flux from current repo
+### OrbStack
 
-```bash
-flux bootstrap github \
-  --owner="$(gh repo view --json owner -q '.owner.login')" \
-  --repository=$(gh repo view --json name -q '.name') \
-  --branch=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name') \
-  --path=./fluxcd/clusters/staging \
-  --interval=30s \
-  --personal
-```
-
-- To force flux to reconcile now:
-
-```bash
-flux reconcile source git flux-system && flux reconcile kustomization flux-system
-```
-
-- To validate that kustomize can build flux
-
-```bash
-kubectl kustomize clusters/staging | kubeconform -strict -summary \
-  -kubernetes-version 1.31.0 \
-  -schema-location default \
-  -skip CustomResourceDefinition \
-  -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
-```
-
-## Stopping
-
-To stop the cluster:
-
-- Minikube - `minikube stop -p k8s-play`
-- OrbStack - `orb stop k8s`
-
-To destroy the cluster:
-
-- Minikube - `minikube delete -p k8s-play`
-- OrbStack - `orb delete k8s -fa`
+Start - `orb start k8s`
+Stop - `orb stop k8s`
+Destroy - `orb delete k8s -a`

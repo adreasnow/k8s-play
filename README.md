@@ -11,6 +11,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
   - [Minikube](https://minikube.sigs.k8s.io/docs/) - Allows you to create local k8s clusters in docker
     - Requires a container runtime such as containerd, CRI-O, orbstack, or Docker
   - Another cluster of your choosing such as kind, k3s, or Docker
+- [kubectl](https://kubernetes.io/docs/tasks/tools/) - For managing k8s resources
 
 ### Reccomendations
 
@@ -23,19 +24,22 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 These are the tools used to manage the repository itself
 
 - [FluxCD](https://fluxcd.io/) - this could also be ArgoCD, but Flux solves the chicken-and-egg problem of defining it's own configuration
+- [Flux Operator](https://fluxoperator.dev) - More feature rich implementation of FluxCD
 - [Kutstomize](https://kustomize.io) - Tool that allows you modify k8s manifest files by creating amendments to the base defintions
 - [Helm](https://helm.sh) - Package manager for k8s that builds upon the idea of templating values
 
 ## Services exposed
 
-- Demo app - https://demo.k8s.orb.local
-- Capacitor - https://capacitor.k8s.orb.local
-- Traefik dasboard - https://dashboard.k8s.orb.local
-- Flux-Operator Dashboard - http://flux-operator.flux-system.svc.cluster.local:9080
+- Demo app - [demo.k8s.orb.local]
+- Capacitor - [capacitor.k8s.orb.local]
+- Traefik dasboard - [dashboard.k8s.orb.local]
+- Flux-Operator Dashboard - [flux-operator.k8s.orb.local]
 
 ## Other TODO
 
-- [ ] Compare FluxCD with ArgoCD
+- [x] Compare FluxCD with ArgoCD
+  - ArgoCD feels more feature rick, but feels much less controllable and lean as a result
+  - The main thing it adds is an interactive dashboard, but adds many more resources, and loses a DAG in favou of "sync waves"
 - [ ] EKS via tofu
 - [ ] AWS resource definitons
   - [ ] Maybe we could create IAM roles from within the KRO definition?
@@ -52,6 +56,7 @@ These are the tools used to manage the repository itself
     - KRO keeps getting stuck...
   - [ ] Namespace KR
   - [ ] Cron KR
+- [ ] Cloudflare-controller
 - [ ] ExternalDNS?
 - [ ] Linkerd2 service mesh ()
 - [ ] Traefik Gateway API CRDs?
@@ -63,63 +68,15 @@ These are the tools used to manage the repository itself
 - [ ] OTEL Colelctor driver
   - [ ] Node level collector
   - [ ] Cluster level collector
+- [ ] OPA for enforcing rules
+  - e.g. limits, PDBs, annotations must be set
 
 ## Productionising Alternatives
 
-- Install Flux via tofu with github app rather than cli bootstrap ([example](https://github.com/controlplaneio-fluxcd/flux-operator/blob/main/config/terraform/main.tf))
+- Install Flux Operator via tofu with github app rather than cli bootstrap
 - Traefik to self-geenrate certs with certbot
-
-## Layout
-
-FluxCD reads the resources from the `./clusters/<clustername>` directory but does not traverse through the tree. Flux always follows the directions of `kustomization.yaml`, and there must always be a kustomization.yaml in a directory for Flux to know what to apply.
-
-A top level `clusters/<clustername>/kustomization.yaml` file is used to specify all the appropriate manifest defintitons that are required for that cluster.
-
-The typical structure will look something like this, though `apps` is often swapped out for `teams` with a `CODEOWNERS.md`:
-
-```bash
-├── apps
-│   ├── base
-│   ├── production
-│   └── staging
-├── infrastructure
-│   ├── base
-│   ├── production
-│   └── staging
-└── clusters
-    ├── production
-    └── staging
-```
-
-Within each cluster the `kustomization.yaml` will reference:
-
-- `flux-system` (FluxCD's self-definitions)
-- `../infrastructure/base` (common infra for all clusters)
-- `../infrastructure/<clustername>` (infrastructure/kustomizations for that cluster)
-- `../apps/base` (common apps for all clusters)
-- `../apps/<clustername>` (ifnrastructure/kustomizations for that cluster)
-
-### Resources
-
-Each resource that comes from a helm repository is defined in three steps:
-
-1. A `HelmRepository` object which specifies the repository as a source to pull helm templates from
-2. A `HelmRelease` object which lets you specify the version of the helm template, and populate it with any input specifications
-3. (optional) A kustomization file that combines the two manifests into one. This isn't strictly necessary, but is best practice
-
-### Ordering
-
-Any resource that's defined in `clusters/<clustername>/kustomization.yaml` will automatically be applied at the same time however many resources are dependent and need to be applied in order.
-
-To accomplish this instead of referencing it in a kustomization's `resources` use use the `kustomize.toolkit.fluxcd.io/v1` `Kustomization` object to create a dependency chain, by defining a directory as a named fluxcd `Kustomization` with `wait=true`, and create another with a depends-on.
-
-e.g. traefik depends on having certs which depdnends on there being a cluster issuer, which depends on cert-manager being installed, so in the `infrastructure/base` directory we:
-
-1. Reference the `certificates` directory in the top level `kustomization.yaml`
-2. Create `resources/certificates/cert-manager-ks.yaml` which applies `resources/certificates/cert-manager`
-3. Create `resources/certificates/cluster-issuer.yaml` which waits for `cert-manager` before applying `resources/certificates/cluster-issuer.yaml`
-4. Create `resources/certificates/traefik-cert-ks.yaml` which waits for `cluster-issuer` before applying `resources/certificates/traefik-cert`
-5. Create a top level `traefik-ks.yaml` which waits for `traefik-cert` before applying `resources/traefik`
+- All dashboards behind cloudflare-operator with access policies
+-
 
 ## Creating a local K8s cluster
 

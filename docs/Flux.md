@@ -1,7 +1,6 @@
 # FluxCD
 
-FluxCD is a GitOpts tool for managing k8s resources in a declarative manner.
-It uses a DAG to handle dependency chaining.
+FluxCD is a GitOpts tool for managing k8s resources in a declarative manner. It uses GitHub (or another git provider) as a source of truth and ensures that what you have defined in source is what is deployed in your cluster
 
 Under the hood FluxCD simply generates a giant k8s manifest file from a repository and uses Kustomize and its own CRDs to build a DAG of all the reources it manages. It then procedurally triggers the k8s api to reconcile these dependencies in order.
 

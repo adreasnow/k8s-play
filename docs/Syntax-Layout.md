@@ -1,4 +1,26 @@
-# How Flux/Kustomize Works
+# Flux and Kustomize Syntaxa and Layout
+
+## Layout
+
+```bash
+fluxcd
+├── apps
+│   ├── base
+│   ├── production
+│   └── staging
+├── clusters
+│   ├── production
+│   └── staging
+└── infrastructure
+    ├── base
+    │   ├── namespaces
+    │   └── resources
+    ├── production
+    └── staging
+        └── namespaces
+```
+
+## Flux
 
 Flux Operator is controlled from the `FluxInstance` defined in the manually applied manifest `./fluxcd/flux-instance-<cluster name>.yaml`.
 
@@ -43,45 +65,3 @@ postBuild:
 - Helm resources are created as a pair of `HelmRepository` and `HelmRelease` objects.
   - The `HelmRelease` object specifies the version of the helm chart, as well as any values to be set.
   - They are typically kept in teh same directory as each other and must have a `kustomization.yaml` file.
-
-## Layout
-
-A top level `clusters/<clustername>/kustomization.yaml` file is used to specify all the appropriate manifest defintitons that are required for that cluster.
-
-The typical structure will look something like this, though `apps` is often swapped out for `teams` with a `CODEOWNERS.md`:
-
-```bash
-├── apps
-│   ├── base
-│   ├── production
-│   └── staging
-├── infrastructure
-│   ├── base
-│   ├── production
-│   └── staging
-└── clusters
-    ├── production
-    └── staging
-```
-
-Within each cluster the `kustomization.yaml` will reference:
-
-- `flux-system` (FluxCD's self-definitions)
-- `../infrastructure/base` (common infra for all clusters)
-- `../infrastructure/<clustername>` (infrastructure/kustomizations for that cluster)
-- `../apps/base` (common apps for all clusters)
-- `../apps/<clustername>` (ifnrastructure/kustomizations for that cluster)
-
-### Ordering
-
-Any resource that's defined in `clusters/<clustername>/kustomization.yaml` will automatically be applied at the same time however many resources are dependent and need to be applied in order.
-
-To accomplish this instead of referencing it in a kustomization's `resources` use use the `kustomize.toolkit.fluxcd.io/v1` `Kustomization` object to create a dependency chain, by defining a directory as a named fluxcd `Kustomization` with `wait=true`, and create another with a depends-on.
-
-e.g. traefik depends on having certs which depdnends on there being a cluster issuer, which depends on cert-manager being installed, so in the `infrastructure/base` directory we:
-
-1. Reference the `certificates` directory in the top level `kustomization.yaml`
-2. Create `resources/certificates/cert-manager-ks.yaml` which applies `resources/certificates/cert-manager`
-3. Create `resources/certificates/cluster-issuer.yaml` which waits for `cert-manager` before applying `resources/certificates/cluster-issuer.yaml`
-4. Create `resources/certificates/traefik-cert-ks.yaml` which waits for `cluster-issuer` before applying `resources/certificates/traefik-cert`
-5. Create a top level `traefik-ks.yaml` which waits for `traefik-cert` before applying `resources/traefik`

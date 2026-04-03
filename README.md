@@ -6,11 +6,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 
 - [FluxCD](https://fluxcd.io/) - Lightweight, stateless, self-managed GitOps tool for k8s
 - [gh](https://cli.github.com) - Used for authenticating with GitHub
-- Local k8s cluster
-  - [orbstack](https://orbstack.dev) - Better, faster, lighter, less corporate docker-compatible container runtime thatn Docker
-  - [Minikube](https://minikube.sigs.k8s.io/docs/) - Allows you to create local k8s clusters in docker
-    - Requires a container runtime such as containerd, CRI-O, orbstack, or Docker
-  - Another cluster of your choosing such as kind, k3s, or Docker
+- Local k8s cluster - see [./docs/Create-k8s-cluster.md] for details/options
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - For managing k8s resources
 
 ### Reccomendations
@@ -76,12 +72,3 @@ These are the tools used to manage the repository itself
 - Install Flux Operator via tofu with github app rather than cli bootstrap
 - Traefik to self-geenrate certs with certbot
 - All dashboards behind cloudflare-operator with access policies
--
-
-## Creating a local K8s cluster
-
-### OrbStack
-
-Start - `orb start k8s`
-Stop - `orb stop k8s`
-Destroy - `orb delete k8s -a`

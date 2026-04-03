@@ -51,15 +51,15 @@ spec:
       sourceRef:
         kind: GitRepository
         name: flux-system
-      << if get inputs "deps" ->>
+    <<- if get inputs "deps" >>
       dependsOn:
-        << range $dep := inputs.deps ->>
+      <<- range $dep := inputs.deps >>
         - name: << $dep >>
-        << end ->>
-      << end ->>
-      << if get inputs "usePostBuild" ->>
+      <<- end >>
+    <<- end >>
+    <<- if get inputs "usePostBuild" >>
       postBuild:
         substituteFrom:
           - kind: ConfigMap
             name: cluster-vars
-      << end ->>
+    <<- end >>

@@ -44,6 +44,7 @@ These are the tools used to manage the repository itself
 
 - [x] FluxCD
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
+  - [ ] Generate certw tih letsencrypt (must be in EKS environment)
 - [x] [traefik](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
 - [ ] [Gateway API CRDs](https://gateway-api.sigs.k8s.io) - CRDs that enable the use of the Gateway API
 - [x] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
@@ -71,5 +72,14 @@ These are the tools used to manage the repository itself
 ## Productionising Alternatives
 
 - Install Flux Operator via tofu with github app rather than cli bootstrap
-- Traefik to self-geenrate certs with certbot
+- Cert manager to self-genrate certs with certbot
 - All dashboards behind cloudflare-operator with access policies
+
+If using Istio
+
+- Uncomment annotations
+
+When moving to EKS
+
+- Uncomment LB for Traefik
+- 

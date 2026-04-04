@@ -1,0 +1,27 @@
+service:
+  enabled: true
+  type: LoadBalancer
+  spec:
+    externalTrafficPolicy: Local  # Preserves client IP, avoids extra hop
+  annotations:
+    # Use the EKS Auto Mode managed LB controller
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+
+    # Attach your Elastic IPs (one per AZ/subnet)
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-AAAA,eipalloc-BBBB"
+
+    # Specify your public subnets explicitly
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-pub-a,subnet-pub-b"
+
+    # TCP passthrough — no TLS termination at NLB (16x cheaper than TLS listener)
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+
+    # Enable cross-zone load balancing so both AZs are reachable
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+    # Health check against Traefik's ping endpoint
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/ping"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "8080"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "HTTP"

@@ -7,6 +7,10 @@ metadata:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
   inputs:
+    - name: coredns
+      path: ./fluxcd/infrastructure/base/resources/coredns
+      prune: false
+
     - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces
 

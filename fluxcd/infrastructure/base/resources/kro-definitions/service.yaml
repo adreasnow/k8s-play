@@ -42,6 +42,13 @@ spec:
               labels:
                 app: deployment
             spec:
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: topology.kubernetes.io/zone
+                  whenUnsatisfiable: ScheduleAnyway
+                  labelSelector:
+                    matchLabels:
+                      app: deployment
               containers:
                 - name: $${schema.spec.name}-deployment
                   image: $${schema.spec.image}
@@ -60,6 +67,8 @@ spec:
         kind: Service
         metadata:
           name: $${schema.spec.name}
+          # annotations:
+          #   networking.istio.io/traffic-distribution: PreferSameZone
         spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints
           selector:

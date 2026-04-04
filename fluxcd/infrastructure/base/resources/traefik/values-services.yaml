@@ -1,0 +1,7 @@
+# --- Traefik Kubernetes Service Configuration ---
+# Base service settings (AWS LB overrides are in values-aws-lb.yaml)
+
+service:
+  enabled: true
+  type: ClusterIP
+  # single: true

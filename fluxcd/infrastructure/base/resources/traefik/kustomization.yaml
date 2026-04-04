@@ -4,3 +4,30 @@ resources:
   - helmRepository.yaml
   - helmRelease.yaml
   - certificate.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: traefik-values-gateway
+    namespace: flux-system
+    files:
+      - values.yaml=values-gateway.yaml
+  - name: traefik-values-pods
+    namespace: flux-system
+    files:
+      - values.yaml=values-pods.yaml
+  - name: traefik-values-services
+    namespace: flux-system
+    files:
+      - values.yaml=values-services.yaml
+  - name: traefik-values-aws-lb
+    namespace: flux-system
+    files:
+      - values.yaml=values-aws-lb.yaml
+  - name: traefik-values-observability
+    namespace: flux-system
+    files:
+      - values.yaml=values-observability.yaml
+  - name: traefik-values-dashboard
+    namespace: flux-system
+    files:
+      - values.yaml=values-dashboard.yaml

@@ -13,3 +13,7 @@ spec:
       kind: Namespace
       metadata:
         name: << inputs.name >>
+        labels:
+        #   istio.io/dataplane-mode: ambient
+        # annotations:
+        #   networking.istio.io/traffic-distribution: PreferSameZone

@@ -4,6 +4,7 @@ resources:
   - helmRepository.yaml
   - helmRelease.yaml
   - certificate.yaml
+  - httpRoute.yaml
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:

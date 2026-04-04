@@ -6,6 +6,11 @@ metadata:
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
+  interval: 10m
+  timeout: 10m
+  retryInterval: 1m
+  wait: true
+  prune: true
   inputs:
     - name: traefik
   resources:

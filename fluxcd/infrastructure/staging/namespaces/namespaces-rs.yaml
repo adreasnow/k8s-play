@@ -1,24 +1,20 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: namespaces-base
+  name: namespaces
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
-  interval: 10m
-  timeout: 10m
-  retryInterval: 1m
   wait: true
-  prune: true
   inputs:
-    - name: traefik
+    - name: demo
   resources:
     - apiVersion: v1
       kind: Namespace
       metadata:
         name: << inputs.name >>
-        # labels:
+        labels:
         #   istio.io/dataplane-mode: ambient
         # annotations:
         #   networking.istio.io/traffic-distribution: PreferSameZone

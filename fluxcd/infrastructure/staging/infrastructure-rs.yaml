@@ -5,12 +5,9 @@ metadata:
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
+    fluxcd.controlplane.io/reconcileTimeout: 10m
 spec:
-  interval: 10m
-  timeout: 10m
-  retryInterval: 1m
   wait: true
-  prune: true
   inputs:
     - name: namespaces
       path: ./fluxcd/infrastructure/base/namespaces

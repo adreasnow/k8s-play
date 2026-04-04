@@ -54,7 +54,8 @@ These are the tools used to manage the repository itself
   - [ ] Cron KR
 - [ ] Cloudflare-controller
 - [ ] ExternalDNS?
-- [ ] Linkerd2 service mesh ()
+- [ ] Istio Ambient Mode
+  - if we want internal TLS. EKS Auto Mode handles TLS between nodes
 - [ ] Traefik Gateway API CRDs?
 - [ ] Gateway/GatewayClass Definitions
 - [ ] Gateway API CRDs

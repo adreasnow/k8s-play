@@ -23,17 +23,20 @@ spec:
     - name: kro-definitions
       path: ./fluxcd/infrastructure/base/resources/kro-definitions
       deps: [kro]
-      useClusterVars: true
+      substituteFrom:
+        - name: cluster-vars
 
     - name: traefik
       path: ./fluxcd/infrastructure/base/resources/traefik
       deps: [cluster-issuer, namespaces-base]
-      useClusterVars: true
+      substituteFrom:
+        - name: cluster-vars
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/base/resources/flux-operator-dashboard
       deps: [traefik]
-      useClusterVars: true
+      substituteFrom:
+        - name: cluster-vars
 
   resourcesTemplate: |
     ---
@@ -59,9 +62,11 @@ spec:
         - name: << $dep >>
       <<- end >>
     <<- end >>
-    <<- if get inputs "useClusterVars" >>
+    <<- if get inputs "substituteFrom" >>
       postBuild:
         substituteFrom:
-          - kind: ConfigMap
-            name: cluster-vars
+      <<- range $sub := inputs.substituteFrom >>
+          - kind: << get $sub "kind" | default "ConfigMap" >>
+            name: << $sub.name >>
+      <<- end >>
     <<- end >>

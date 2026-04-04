@@ -33,9 +33,11 @@ spec:
         - name: << $dep >>
       <<- end >>
     <<- end >>
-    <<- if get inputs "useClusterVars" >>
+    <<- if get inputs "substituteFrom" >>
       postBuild:
         substituteFrom:
-          - kind: ConfigMap
-            name: cluster-vars
+      <<- range $sub := inputs.substituteFrom >>
+          - kind: << get $sub "kind" | default "ConfigMap" >>
+            name: << $sub.name >>
+      <<- end >>
     <<- end >>

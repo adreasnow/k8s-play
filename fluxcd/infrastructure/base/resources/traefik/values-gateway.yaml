@@ -13,10 +13,10 @@ providers:
 # EntryPoints are the network listeners for incoming traffic
 ports:
   websecure:
-    port: 8443
+    port: 443
     hostPort: 443
   web:
-    port: 8080
+    port: 80
     hostPort: 80
     http:
       redirections:         # redirects all traffic to the 'websecure' entry point
@@ -29,13 +29,13 @@ ports:
 gateway:
   listeners:
     web:
-      port: 8080
+      port: 80
       protocol: HTTP
       namespacePolicy:
         from: All
 
     websecure:
-      port: 8443
+      port: 443
       protocol: HTTPS
       namespacePolicy:
         from: All

@@ -17,15 +17,3 @@ podDisruptionBudget:
 
 # podAnnotations:
 #   ambient.istio.io/redirection: disabled
-
-additionalArguments:
-  - "--ping"
-  - "--ping.entryPoint=web"
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 128Mi
-  limits:
-    cpu: 1000m
-    memory: 512Mi

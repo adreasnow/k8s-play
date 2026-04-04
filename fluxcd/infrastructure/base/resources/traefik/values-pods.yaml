@@ -1,8 +1,6 @@
 deployment:
   replicas: 2 # match the number of AZs
 
-hostNetwork: true
-
 # One Traefik per AZ
 topologySpreadConstraints:
   - maxSkew: 1

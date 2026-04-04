@@ -21,14 +21,20 @@ spec:
     cleanupOnFail: true
   valuesFrom:
     - kind: ConfigMap
-      name: traefik-values-gateway
+      name: traefik-values
+      valuesKey: networking
     - kind: ConfigMap
-      name: traefik-values-pods
+      name: traefik-values
+      valuesKey: pods
     - kind: ConfigMap
-      name: traefik-values-services
+      name: traefik-values
+      valuesKey: services
     # - kind: ConfigMap
-    #   name: traefik-values-aws-lb
+    #   name: traefik-values
+    #   valuesKey: aws-lb
     - kind: ConfigMap
-      name: traefik-values-observability
+      name: traefik-values
+      valuesKey: observability
     - kind: ConfigMap
-      name: traefik-values-dashboard
+      name: traefik-values
+      valuesKey: dashboard

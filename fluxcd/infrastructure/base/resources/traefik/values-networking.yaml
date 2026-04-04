@@ -10,23 +10,6 @@ providers:
     enabled: true
     nativeLBByDefault: true # Use native load balancer for Gateway listeners to keep traffic local
 
-# EntryPoints are the network listeners for incoming traffic
-ports:
-  web:
-    port: 80
-    nodePort: 30000
-    http:
-      redirections: # redirects non-tls traffic to the 'websecure' entry point
-        entryPoint:
-          to: websecure
-          scheme: https
-          permanent: true
-
-  # Defines the HTTPS entry point named 'websecure'
-  websecure:
-    port: 443
-    nodePort: 30001
-
 # Gateway Listeners
 gateway:
   listeners:
@@ -46,3 +29,19 @@ gateway:
         - kind: Secret
           name: local-selfsigned-tls  # the Secret we created before the installation
           group: ""
+
+
+# EntryPoints are the network listeners for incoming traffic
+ports:
+  websecure:
+    port: 443
+    nodePort: 30001
+  web:
+    port: 80
+    nodePort: 30000
+    http:
+      redirections: # redirects non-tls traffic to the 'websecure' entry point
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true

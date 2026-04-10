@@ -67,10 +67,10 @@ spec:
         kind: Service
         metadata:
           name: $${schema.spec.name}
-          # annotations:
-          #   networking.istio.io/traffic-distribution: PreferSameZone
+          labels:
+            networking.istio.io/traffic-distribution: PreferSameZone # Prefer same AZ/same node endpoints (istio)
         spec:
-          trafficDistribution: PreferClose # Prefer same AZ/same node endpoints
+          trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
             app: deployment
           ports: $${schema.spec.ports}
@@ -85,8 +85,11 @@ spec:
           name: $${schema.spec.name}
         spec:
           parentRefs:
-            - name: traefik-gateway
+            - name: traefik-gateway # north-south
               namespace: traefik
+            - name: waypoint # east-west
+              kind: Gateway
+              namespace: $${schema.spec.namespace}
           hostnames:
             - $${schema.spec.hostname}.${DOMAIN}
           rules:
@@ -97,3 +100,12 @@ spec:
               backendRefs:
                 - name: $${schema.spec.name}
                   port: $${schema.spec.ports[0].port}
+
+    - id: serviceAccount
+      template:
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: $${schema.spec.name}
+          namespace: $${schema.spec.namespace}
+        automountServiceAccountToken: false

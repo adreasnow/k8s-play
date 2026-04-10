@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha1
+kind: MeshConfig
+metadata:
+  name: istio
+  namespace: istio-system
+spec:
+  defaultConfig:
+    proxyMetadata:
+      ISTIO_META_AUTO_WAYPOINT: true
+    annotations:
+      istio.io/waypoint-inbound-binding: STRICT
+    labels:
+      istio.io/waypoint-for: namespace

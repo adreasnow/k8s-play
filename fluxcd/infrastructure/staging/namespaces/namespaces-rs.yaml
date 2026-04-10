@@ -15,6 +15,111 @@ spec:
       metadata:
         name: << inputs.name >>
         labels:
-        #   istio.io/dataplane-mode: ambient
-        # annotations:
-        #   networking.istio.io/traffic-distribution: PreferSameZone
+          istio.io/dataplane-mode: ambient
+          istio.io/use-waypoint: waypoint
+      # spec:
+      #   trafficDistribution: PreferClose
+
+    # # Denies traffic from pods not using the waypoint service account
+    # - apiVersion: security.istio.io/v1
+    #   kind: AuthorizationPolicy
+    #   metadata:
+    #     name: require-waypoint
+    #     namespace: << inputs.name >>
+    #   spec:
+    #     action: DENY
+    #     rules:
+    #     - from:
+    #       - source:
+    #           notPrincipals:
+    #           - "cluster.local/ns/<< inputs.name >>/sa/waypoint"
+
+    # Create an istio waypoint gateway for the namespace
+    - apiVersion: gateway.networking.k8s.io/v1
+      kind: Gateway
+      metadata:
+        name: waypoint
+        namespace: << inputs.name >>
+        annotations:
+          istio.io/waypoint-inbound-binding: "STRICT"
+        labels:
+          istio.io/waypoint-for: namespace
+      spec:
+        gatewayClassName: istio-waypoint
+        listeners:
+          - name: mesh
+            port: 15008
+            protocol: HBONE
+
+    # Allows pods in the same namespace to communicate with each other
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-same-namespace-communication
+        namespace: << inputs.name >>
+      spec:
+        action: ALLOW
+        rules:
+          - from:
+              - source:
+                  namespaces:
+                    - << inputs.name >>
+
+      # Blocks egress to system namespaces
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: block-system-namespace-egress
+        namespace: << inputs.name >>
+      spec:
+        action: DENY
+        policyTypes:
+          - Egress
+        rules:
+          - to:
+            - operation:
+                namespaces:
+                  - kube-system
+                  - istio-system
+                  - kube-public
+                  - kube-node-lease
+                  - traefik
+
+      # Allow DNS resolution for the namespace
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-dns-egress
+        namespace: << inputs.name >>
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Egress
+        egress:
+          - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: kube-system
+              podSelector:
+                matchLabels:
+                  k8s-app: kube-dns
+            ports:
+              - port: 53
+                protocol: UDP
+              - port: 53
+                protocol: TCP
+
+      # Allow egress to external networks
+      # Does not overwrite existing DENY rules
+      # all east-west traffic still goes through Istio with STRICT routing
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-egress
+        namespace: << inputs.name >>
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Egress
+        egress:
+          - {}

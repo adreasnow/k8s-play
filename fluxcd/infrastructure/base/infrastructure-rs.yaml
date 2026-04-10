@@ -16,6 +16,9 @@ spec:
     - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces
 
+    - name: istio
+      path: ./fluxcd/infrastructure/base/resources/istio
+
     - name: cert-manager
       path: ./fluxcd/infrastructure/base/resources/cert-manager
 

@@ -4,5 +4,5 @@ metadata:
   name: cluster-vars
   namespace: flux-system
 data:
-  domain: docker.local
+  domain: k8s.orb.local
   name: techteamtools-staging

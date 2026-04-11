@@ -21,3 +21,5 @@ spec:
     cleanupOnFail: true
   values:
     profile: ambient
+    global:
+      platform: minikube

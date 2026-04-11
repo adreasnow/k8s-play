@@ -1,13 +1,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: istio-cni
+  name: istio-ztunnel
   namespace: flux-system
 spec:
   interval: 10m
+  dependsOn:
+    - name: istio-cni
   chart:
     spec:
-      chart: cni
+      chart: ztunnel
       version: 1.29.1
       sourceRef:
         kind: HelmRepository
@@ -17,5 +19,3 @@ spec:
   targetNamespace: istio-system
   upgrade:
     cleanupOnFail: true
-  values:
-    profile: ambient

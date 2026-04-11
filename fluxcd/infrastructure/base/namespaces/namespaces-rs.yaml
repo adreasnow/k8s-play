@@ -16,7 +16,7 @@ spec:
         name: << inputs.name >>
       spec:
         trafficDistribution: PreferClose
-        # labels:
-        #   istio.io/dataplane-mode: ambient
-        # annotations:
-        #   networking.istio.io/traffic-distribution: PreferSameZone
+        labels:
+          istio.io/dataplane-mode: ambient
+        annotations:
+          networking.istio.io/traffic-distribution: PreferSameZone

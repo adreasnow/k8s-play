@@ -9,14 +9,16 @@ metadata:
 spec:
   wait: true
   inputs:
-    # - name: coredns
-    #   path: ./fluxcd/infrastructure/base/resources/coredns
 
     - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces
 
     - name: istio
       path: ./fluxcd/infrastructure/base/resources/istio
+
+    - name: netowrking
+      path: ./fluxcd/infrastructure/base/resources/networking
+      deps: [istio]
 
     - name: cert-manager
       path: ./fluxcd/infrastructure/base/resources/cert-manager

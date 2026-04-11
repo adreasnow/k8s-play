@@ -23,19 +23,19 @@ spec:
       spec:
         trafficDistribution: PreferClose
 
-    # # Denies traffic from pods not using the waypoint service account
-    # - apiVersion: security.istio.io/v1
-    #   kind: AuthorizationPolicy
-    #   metadata:
-    #     name: require-waypoint
-    #     namespace: << inputs.name >>
-    #   spec:
-    #     action: DENY
-    #     rules:
-    #     - from:
-    #       - source:
-    #           notPrincipals:
-    #           - "cluster.local/ns/<< inputs.name >>/sa/waypoint"
+    # Denies traffic from pods not using the waypoint service account
+    - apiVersion: security.istio.io/v1
+      kind: AuthorizationPolicy
+      metadata:
+        name: require-waypoint
+        namespace: << inputs.name >>
+      spec:
+        action: DENY
+        rules:
+        - from:
+          - source:
+              notPrincipals:
+              - "cluster.local/ns/<< inputs.name >>/sa/waypoint"
 
     # Create an istio waypoint gateway for the namespace
     - apiVersion: gateway.networking.k8s.io/v1

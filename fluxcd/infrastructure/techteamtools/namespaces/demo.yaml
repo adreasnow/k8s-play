@@ -2,6 +2,7 @@ apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSetInputProvider
 metadata:
   name: demo
+  namespace: flux-system
   labels:
     template: app-namespace
 spec:

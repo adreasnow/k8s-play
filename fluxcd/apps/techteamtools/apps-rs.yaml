@@ -1,10 +1,10 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: apps
+  name: apps-staging
   namespace: flux-system
   annotations:
-    fluxcd.controlplane.io/reconcileEvery: "1h"
+    fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
   dependsOn:
     - apiVersion: fluxcd.controlplane.io/v1
@@ -12,15 +12,9 @@ spec:
       name: infrastructure
       namespace: flux-system
       ready: true
-    - apiVersion: fluxcd.controlplane.io/v1
-      kind: ResourceSet
-      name: infrastructure-base
-      namespace: flux-system
-      ready: true
   inputs:
-    - name: demo
-      path: ./fluxcd/apps/base/demo
-      namespace: demo
+    - name: common-apps
+      path: ./fluxcd/apps/common
   resources:
     - apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization

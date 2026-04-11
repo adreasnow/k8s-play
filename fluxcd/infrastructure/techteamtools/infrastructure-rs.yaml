@@ -9,8 +9,10 @@ metadata:
 spec:
   wait: true
   inputs:
+    - name: common-infrastructure
+      path: ./fluxcd/infrastructure/common
     - name: namespaces
-      path: ./fluxcd/infrastructure/base/namespaces
+      path: ./fluxcd/infrastructure/techteamtools/namespaces
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1

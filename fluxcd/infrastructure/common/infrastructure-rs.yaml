@@ -1,7 +1,7 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: infrastructure-base
+  name: infrastructure-common
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
@@ -9,40 +9,40 @@ metadata:
 spec:
   wait: true
   inputs:
-    - name: namespaces-base
-      path: ./fluxcd/infrastructure/base/namespaces
+    - name: namespaces-common
+      path: ./fluxcd/infrastructure/common/namespaces
 
     - name: istio
-      path: ./fluxcd/infrastructure/base/resources/istio
+      path: ./fluxcd/infrastructure/common/resources/istio
 
     - name: netowrking-extras
-      path: ./fluxcd/infrastructure/base/resources/networking
+      path: ./fluxcd/infrastructure/common/resources/networking
       deps: [istio]
 
     - name: cert-manager
-      path: ./fluxcd/infrastructure/base/resources/cert-manager
+      path: ./fluxcd/infrastructure/common/resources/cert-manager
 
     - name: cluster-issuer
-      path: ./fluxcd/infrastructure/base/resources/cluster-issuer
+      path: ./fluxcd/infrastructure/common/resources/cluster-issuer
       deps: [cert-manager]
 
     - name: kro
-      path: ./fluxcd/infrastructure/base/resources/kro
+      path: ./fluxcd/infrastructure/common/resources/kro
 
     - name: kro-definitions
-      path: ./fluxcd/infrastructure/base/resources/kro-definitions
+      path: ./fluxcd/infrastructure/common/resources/kro-definitions
       deps: [kro, istio]
       substituteFrom:
         - name: cluster-vars
 
     - name: traefik
-      path: ./fluxcd/infrastructure/base/resources/traefik
-      deps: [cluster-issuer, namespaces-base]
+      path: ./fluxcd/infrastructure/common/resources/traefik
+      deps: [cluster-issuer, namespaces-common]
       substituteFrom:
         - name: cluster-vars
 
     - name: flux-operator-dashboard
-      path: ./fluxcd/infrastructure/base/resources/flux-operator-dashboard
+      path: ./fluxcd/infrastructure/common/resources/flux-operator-dashboard
       substituteFrom:
         - name: cluster-vars
 

@@ -16,7 +16,7 @@ spec:
       path: ./fluxcd/infrastructure/common/resources/istio
 
     - name: netowrking-extras
-      path: ./fluxcd/infrastructure/common/resources/networking
+      path: ./fluxcd/infrastructure/common/resources/networking-extras
       deps: [istio]
 
     - name: cert-manager

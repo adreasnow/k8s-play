@@ -1,7 +1,0 @@
-name: kro
-chart: kro
-repoURL: registry.k8s.io/kro/charts
-version: "0.9.0"
-namespace: kro-system
-createNamespace: "true"
-syncWave: "-2"

@@ -1,7 +1,0 @@
-name: traefik
-chart: traefik
-repoURL: https://traefik.github.io/charts
-version: "39.0.6"
-namespace: traefik
-createNamespace: "false"
-syncWave: "-1"

@@ -22,4 +22,4 @@ spec:
   values:
     profile: ambient
     global:
-      platform: minikube
+      platform: minikube # TODO: configure for EKS https://istio.io/latest/docs/ambient/install/platform-prerequisites/#amazon-elastic-kubernetes-service-eks

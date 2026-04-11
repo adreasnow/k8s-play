@@ -20,8 +20,8 @@ spec:
         labels:
           istio.io/dataplane-mode: ambient
           istio.io/use-waypoint: waypoint
-      # spec:
-      #   trafficDistribution: PreferClose
+      spec:
+        trafficDistribution: PreferClose
 
     # # Denies traffic from pods not using the waypoint service account
     # - apiVersion: security.istio.io/v1

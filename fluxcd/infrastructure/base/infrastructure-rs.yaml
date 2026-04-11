@@ -9,8 +9,8 @@ metadata:
 spec:
   wait: true
   inputs:
-    - name: coredns
-      path: ./fluxcd/infrastructure/base/resources/coredns
+    # - name: coredns
+    #   path: ./fluxcd/infrastructure/base/resources/coredns
 
     - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces

@@ -4,6 +4,5 @@ metadata:
   name: cluster-vars
   namespace: flux-system
 data:
-  cluster:
-    domain: staging.owlwayson.com
-    name: techteamtools-staging
+  cluster.domain: staging.owlwayson.com
+  cluster.name: techteamtools-staging

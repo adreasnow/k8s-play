@@ -6,7 +6,7 @@ api:
 ingressRoute:
   dashboard:
     enabled: true
-    matchRule: Host(`dashboard.${cluster.domain}`)
+    matchRule: Host(`dashboard.${domain}`)
     entryPoints:
       - websecure
     middlewares:

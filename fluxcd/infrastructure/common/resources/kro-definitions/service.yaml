@@ -91,7 +91,7 @@ spec:
               kind: Gateway
               namespace: $${schema.spec.namespace}
           hostnames:
-            - $${schema.spec.hostname}.${cluster.domain}
+            - $${schema.spec.hostname}.${domain}
           rules:
             - matches:
                 - path:

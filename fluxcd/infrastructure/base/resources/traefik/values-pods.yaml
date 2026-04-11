@@ -1,5 +1,5 @@
 deployment:
-  replicas: 2 # match the number of AZs
+  replicas: 3 # match the number of AZs
 
 # # One Traefik per AZ
 # topologySpreadConstraints:

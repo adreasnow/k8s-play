@@ -8,6 +8,9 @@ metadata:
     fluxcd.controlplane.io/reconcileTimeout: 10m
 spec:
   wait: true
+  commonMetadata:
+    annotations:
+      fluxcd.controlplane.io/prune: disabled
   inputs:
     - name: coredns
       path: ./fluxcd/infrastructure/base/resources/coredns

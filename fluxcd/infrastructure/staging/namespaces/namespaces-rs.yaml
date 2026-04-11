@@ -6,6 +6,9 @@ metadata:
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
+  commonMetadata:
+    annotations:
+      fluxcd.controlplane.io/prune: disabled
   wait: true
   inputs:
     - name: demo

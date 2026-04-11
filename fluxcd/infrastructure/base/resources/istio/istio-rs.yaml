@@ -40,7 +40,7 @@ spec:
       timeout: 10m
       retryInterval: 1m
       path: << inputs.path >>
-      prune: << get inputs "prune" | default "true" >>
+      prune: << get inputs "prune" | default "false" >>
       force: << get inputs "force" | default "false" >>
       wait: true
       sourceRef:

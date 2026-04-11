@@ -8,13 +8,9 @@ metadata:
     fluxcd.controlplane.io/reconcileTimeout: 10m
 spec:
   wait: true
-  commonMetadata:
-    annotations:
-      fluxcd.controlplane.io/prune: disabled
   inputs:
     - name: coredns
       path: ./fluxcd/infrastructure/base/resources/coredns
-      prune: false
 
     - name: namespaces-base
       path: ./fluxcd/infrastructure/base/namespaces
@@ -62,7 +58,7 @@ spec:
       timeout: 10m
       retryInterval: 1m
       path: << inputs.path >>
-      prune: << get inputs "prune" | default "true" >>
+      prune: << get inputs "prune" | default "false" >>
       force: << get inputs "force" | default "false" >>
       wait: true
       sourceRef:

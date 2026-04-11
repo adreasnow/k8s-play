@@ -26,9 +26,9 @@ Requires a container runtime such as containerd, CRI-O, orbstack, or Docker, or 
 
 Domain = `docker.local`
 
-- Start- `minikube start -p staging --ports=80:30000 --ports=443:30001`
-- Stop- `minikube stop -p staging`
-- Destroy - `minikube delete -p staging`
+- Start- `minikube start -p techteamtools --ports=80:30000 --ports=443:30001`
+- Stop- `minikube stop -p techteamtools`
+- Destroy - `minikube delete -p techteamtools`
 
 ## Other
 

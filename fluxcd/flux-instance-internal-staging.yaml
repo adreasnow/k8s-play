@@ -24,6 +24,6 @@ spec:
     kind: GitRepository
     url: ssh://git@github.com/adreasnow/k8s-play
     ref: refs/heads/main
-    path: fluxcd/clusters/techteamtools-staging
+    path: fluxcd/clusters/internal-staging
     pullSecret: flux-system
     # provider: github

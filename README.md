@@ -61,7 +61,7 @@ These are the tools used to manage the repository itself
   - [ ] Node level collector
   - [ ] Cluster level collector
 - [ ] OLTM write heads for all clusters
-- [ ] LGTM read heads for techteamtools cluster
+- [ ] LGTM read heads for internal cluster
 - [ ] OPA/kyverno for enforcing rules
   - e.g. limits, PDBs, annotations must be set
 - [ ] RBAC

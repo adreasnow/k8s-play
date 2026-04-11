@@ -5,19 +5,28 @@
 ```bash
 fluxcd
 ├── apps
-│   ├── base
-│   ├── production
-│   └── staging
+│   ├── common
+│   │   └── apps
+│   ├── internal
+│   │   └── apps
+│   └── bellroy
+│       └── apps
 ├── clusters
-│   ├── production
-│   └── staging
+│   ├── bellroy-test
+│   ├── bellroy-staging
+│   ├── bellroy-production
+│   ├── internal-staging
+│   └── internal
 └── infrastructure
-    ├── base
+    ├── common
     │   ├── namespaces
     │   └── resources
-    ├── production
-    └── staging
-        └── namespaces
+    ├── bellroy
+    │   ├── namespaces
+    │   └── resources
+    └── internal
+        ├── namespaces
+        └── resources
 ```
 
 ## Flux

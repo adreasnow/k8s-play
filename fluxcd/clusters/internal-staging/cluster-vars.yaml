@@ -5,4 +5,4 @@ metadata:
   namespace: flux-system
 data:
   domain: k8s.orb.local # TODO
-  name: techteamtools-staging # TODO
+  name: internal-staging # TODO

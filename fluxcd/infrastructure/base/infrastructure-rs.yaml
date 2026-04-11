@@ -31,7 +31,7 @@ spec:
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/base/resources/kro-definitions
-      deps: [kro]
+      deps: [kro, istio]
       substituteFrom:
         - name: cluster-vars
 

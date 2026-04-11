@@ -3,5 +3,5 @@ kind: Service
 metadata:
   name: kube-dns
   namespace: kube-system
-  spec:
-    trafficDistribution: PreferClose
+  annotations:
+    service.kubernetes.io/topology-mode: Auto

@@ -89,7 +89,7 @@ spec:
               namespace: traefik
             - name: waypoint # east-west
               kind: Gateway
-              namespace: $${schema.spec.namespace}
+              namespace: $${metadata.namespace}
           hostnames:
             - $${schema.spec.hostname}.${domain}
           rules:
@@ -107,5 +107,5 @@ spec:
         kind: ServiceAccount
         metadata:
           name: $${schema.spec.name}
-          namespace: $${schema.spec.namespace}
+          namespace: $${metadata.namespace}
         automountServiceAccountToken: false

@@ -44,29 +44,24 @@ These are the tools used to manage the repository itself
 
 - [x] FluxCD
 - [x] [cert-manager](https://cert-manager.io) - Used to generate certificates for TLS
-  - [ ] Generate certw tih letsencrypt (must be in EKS environment)
+  - [ ] Generate certs tih letsencrypt (must be in EKS environment)
 - [x] [traefik](https://doc.traefik.io/traefik/) - RP that routes traffic to services inside of k8s
-- [ ] [Gateway API CRDs](https://gateway-api.sigs.k8s.io) - CRDs that enable the use of the Gateway API
-- [x] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource grupings into CRDs
+- [x] [KRO](https://kro.run) - Kube Resource Orchestrator - abstracts resource groupings into CRDs
   - [ ] App KR
-    - TODO: test this
-    - KRO keeps getting stuck...
-  - [ ] Namespace KR
   - [ ] Cron KR
 - [ ] Cloudflare-controller
 - [ ] ExternalDNS?
-- [ ] Istio Ambient Mode
-  - if we want internal TLS. EKS Auto Mode handles TLS between nodes
-- [ ] Traefik Gateway API CRDs?
-- [ ] Gateway/GatewayClass Definitions
-- [ ] Gateway API CRDs
+- [x] Istio Ambient Mode
+  - [ ] Validate it's working as desired
 - [ ] AWS ASCP
 - [ ] Secrets Store CSI driver
 - [ ] KEDA
-- [ ] OTEL Colelctor driver
+- [ ] OTEL Collector driver
   - [ ] Node level collector
   - [ ] Cluster level collector
-- [ ] OPA for enforcing rules
+- [ ] OLTM write heads for all clusters
+- [ ] LGTM read heads for techteamtools cluster
+- [ ] OPA/kyverno for enforcing rules
   - e.g. limits, PDBs, annotations must be set
 
 ## Productionising Alternatives
@@ -82,4 +77,4 @@ If using Istio
 When moving to EKS
 
 - Uncomment LB for Traefik
-- 
+-

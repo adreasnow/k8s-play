@@ -42,7 +42,6 @@ spec:
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/base/resources/flux-operator-dashboard
-      deps: [traefik]
       substituteFrom:
         - name: cluster-vars
 

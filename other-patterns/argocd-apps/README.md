@@ -11,11 +11,11 @@ This directory contains the ArgoCD deployment configuration, migrated from FluxC
 
 ## Clusters
 
-| Cluster    | Domain                   | ArgoCD Server URL                  |
-|------------|--------------------------|------------------------------------|
-| test       | test.domain.local        | `https://test.domain.local`        |
-| staging    | k8s.orb.local            | `https://kubernetes.default.svc`   |
-| production | production.domain.local  | `https://production.domain.local`  |
+| Cluster    | Domain                  | ArgoCD Server URL                 |
+| ---------- | ----------------------- | --------------------------------- |
+| test       | test.domain.local       | `https://test.domain.local`       |
+| staging    | k8s.orb.local           | `https://kubernetes.default.svc`  |
+| production | production.domain.local | `https://production.domain.local` |
 
 ## Directory Structure
 
@@ -78,12 +78,12 @@ argocd-apps/
 
 Components are ordered via ArgoCD sync-wave annotations:
 
-| Wave | Components                                  |
-|------|---------------------------------------------|
-| -3   | cert-manager, gateway-api CRDs, namespaces  |
-| -2   | cluster-issuer, kro                         |
-| -1   | kro-definitions, traefik                    |
-|  0   | demo (application workloads)                |
+| Wave | Components                                 |
+| ---- | ------------------------------------------ |
+| -3   | cert-manager, gateway-api CRDs, namespaces |
+| -2   | cluster-issuer, kro                        |
+| -1   | kro-definitions, traefik                   |
+| 0    | demo (application workloads)               |
 
 ### Multi-Source Applications
 

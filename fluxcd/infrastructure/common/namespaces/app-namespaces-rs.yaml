@@ -1,17 +1,20 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: namespaces
+  name: app-namespaces
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
 spec:
   commonMetadata:
     annotations:
-      fluxcd.controlplane.io/prune: disabled
+      fluxcd.controlplane.io/prune: enabled
   wait: true
-  inputs:
-    - name: demo
+  inputsFrom:
+    - kind: ResourceSetInputProvider
+      selector:
+        matchLabels:
+          template: app-namespace
   resources:
     - apiVersion: v1
       kind: Namespace

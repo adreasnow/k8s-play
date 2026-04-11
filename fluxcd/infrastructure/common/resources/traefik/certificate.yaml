@@ -8,9 +8,9 @@ spec:
   issuerRef:
     name: selfsigned-cluster-issuer
     kind: ClusterIssuer
-  commonName: "*.${DOMAIN}"
+  commonName: "*.${cluster.domain}"
   dnsNames:
-    - "*.${DOMAIN}"
-    - "${DOMAIN}"
+    - "*.${cluster.domain}"
+    - "${cluster.domain}"
   duration: 8760h    # 1 year
   renewBefore: 360h  # renew 15 days before expiry

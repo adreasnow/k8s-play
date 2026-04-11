@@ -4,5 +4,6 @@ metadata:
   name: cluster-vars
   namespace: flux-system
 data:
-  DOMAIN: k8s.orb.local
-  CLUSTER: staging
+  cluster:
+    domain: k8s.orb.local
+    name: bellroy-staging

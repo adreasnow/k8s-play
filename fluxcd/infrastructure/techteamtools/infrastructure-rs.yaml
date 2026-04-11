@@ -1,7 +1,7 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: infrastructure-base
+  name: infrastructure
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcileEvery: 1h
@@ -9,44 +9,8 @@ metadata:
 spec:
   wait: true
   inputs:
-
-    - name: namespaces-base
+    - name: namespaces
       path: ./fluxcd/infrastructure/base/namespaces
-
-    - name: istio
-      path: ./fluxcd/infrastructure/base/resources/istio
-
-    - name: netowrking
-      path: ./fluxcd/infrastructure/base/resources/networking
-      deps: [istio]
-
-    - name: cert-manager
-      path: ./fluxcd/infrastructure/base/resources/cert-manager
-
-    - name: cluster-issuer
-      path: ./fluxcd/infrastructure/base/resources/cluster-issuer
-      deps: [cert-manager]
-
-    - name: kro
-      path: ./fluxcd/infrastructure/base/resources/kro
-
-    - name: kro-definitions
-      path: ./fluxcd/infrastructure/base/resources/kro-definitions
-      deps: [kro, istio]
-      substituteFrom:
-        - name: cluster-vars
-
-    - name: traefik
-      path: ./fluxcd/infrastructure/base/resources/traefik
-      deps: [cluster-issuer, namespaces-base]
-      substituteFrom:
-        - name: cluster-vars
-
-    - name: flux-operator-dashboard
-      path: ./fluxcd/infrastructure/base/resources/flux-operator-dashboard
-      substituteFrom:
-        - name: cluster-vars
-
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1

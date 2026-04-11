@@ -101,7 +101,7 @@ spec:
                 - name: $${schema.spec.name}
                   port: $${schema.spec.ports[0].port}
 
-    - id: serviceAccount
+    - id: serviceAccount # TODO: figure out proper RBAC...
       template:
         apiVersion: v1
         kind: ServiceAccount

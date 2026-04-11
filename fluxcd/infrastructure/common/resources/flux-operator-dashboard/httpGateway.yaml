@@ -8,7 +8,7 @@ spec:
     - name: traefik-gateway
       namespace: traefik
   hostnames:
-    - flux-operator.${domain}
+    - flux-operator.admin.${domain}
   rules:
     - matches:
         - path:

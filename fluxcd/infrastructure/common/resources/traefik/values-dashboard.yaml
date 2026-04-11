@@ -6,7 +6,7 @@ api:
 ingressRoute:
   dashboard:
     enabled: true
-    matchRule: Host(`dashboard.${domain}`)
+    matchRule: Host(`dashboard.admin.${domain}`)
     entryPoints:
       - websecure
     middlewares:

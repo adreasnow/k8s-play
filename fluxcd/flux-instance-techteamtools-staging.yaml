@@ -13,14 +13,14 @@ spec:
     - source-controller
     - kustomize-controller
     - helm-controller
-    - notification-controller
+    - notification-controller # TODO: configure slack notifications
   cluster:
     type: aws
     size: medium
-    multitenant: false
+    multitenant: false # TODO?
     networkPolicy: true
     domain: cluster.local
-  sync:
+  sync: # TODO: configure for github app
     kind: GitRepository
     url: ssh://git@github.com/adreasnow/k8s-play
     ref: refs/heads/main

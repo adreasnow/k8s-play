@@ -8,12 +8,14 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 - [gh](https://cli.github.com) - Used for authenticating with GitHub
 - Local k8s cluster - see [./docs/Create-k8s-cluster.md] for details/options
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - For managing k8s resources
+- [OrbStack](https://orbstack.dev)
+  - This setup worksbest with orbstack as it natively supports modern k8s features without needing to configure k8s plumbing
 
 ### Reccomendations
 
 - [k9s](https://k9scli.io) - TUI for exploring/managing k8s resources
 - [flux9s](https://github.com/dgunzy/flux9s) - TUI or exploring/managing the status of FluxCD in a k9s way
-- [kubeconform](https://github.com/yannh/kubeconform) - validates that the
+- [kubeconform](https://github.com/yannh/kubeconform) - validates that the yaml manifest meets the APIs it references
 
 ## Base Tools used
 
@@ -26,10 +28,9 @@ These are the tools used to manage the repository itself
 
 ## Services exposed
 
-- Demo app - [demo.k8s.orb.local]
-- Capacitor - [capacitor.k8s.orb.local]
-- Traefik dasboard - [dashboard.k8s.orb.local]
-- Flux-Operator Dashboard - [flux-operator.k8s.orb.local]
+- Demo app - [https://demo.k8s.orb.local]
+- Traefik dasboard - [https://dashboard.admin.k8s.orb.local]
+- Flux-Operator Dashboard - [https://flux-operator.admin.k8s.orb.local]
 
 ## Other TODO
 
@@ -63,12 +64,17 @@ These are the tools used to manage the repository itself
 - [ ] LGTM read heads for techteamtools cluster
 - [ ] OPA/kyverno for enforcing rules
   - e.g. limits, PDBs, annotations must be set
+- [ ] RBAC
+- [ ] [EKS PodIdentity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+- [ ] ~~IDP~~ Just use IdentityCentre
 
 ## Productionising Alternatives
 
 - Install Flux Operator via tofu with github app rather than cli bootstrap
 - Cert manager to self-genrate certs with certbot
 - All dashboards behind cloudflare-operator with access policies
+
+anyhting marked TODO
 
 If using Istio
 
@@ -77,4 +83,3 @@ If using Istio
 When moving to EKS
 
 - Uncomment LB for Traefik
--

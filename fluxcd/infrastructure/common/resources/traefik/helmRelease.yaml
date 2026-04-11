@@ -29,7 +29,7 @@ spec:
     - kind: ConfigMap
       name: traefik-values
       valuesKey: services
-    # - kind: ConfigMap
+    # - kind: ConfigMap # TODO: configure/enable aws lb
     #   name: traefik-values
     #   valuesKey: aws-lb
     - kind: ConfigMap

@@ -1,5 +1,4 @@
-# TODO: configure for github app - https://fluxoperator.dev/docs/crd/gitrepository/#github
-
+# # https://fluxoperator.dev/docs/crd/gitrepository/#github
 # resource "kubernetes_secret" "flux_github" {
 #   # depends_on = [orbstack_k8s.cluster]
 
@@ -18,6 +17,7 @@
 #   type = "Opaque"
 # }
 
+# https://fluxoperator.dev/docs/crd/gitrepository/#ssh-authentication
 resource "kubernetes_secret" "flux_github" {
   # depends_on = [orbstack_k8s.cluster]
 

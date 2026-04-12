@@ -1,3 +1,4 @@
+# https://artifacthub.io/packages/helm/flux-operator/flux-operator
 resource "helm_release" "flux_operator" {
   # depends_on = [orbstack_k8s.cluster]
 

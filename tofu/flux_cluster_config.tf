@@ -1,3 +1,4 @@
+# https://artifacthub.io/packages/helm/flux-instance/flux-instance
 resource "helm_release" "flux_instance" {
   depends_on = [helm_release.flux_operator]
 

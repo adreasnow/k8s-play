@@ -68,6 +68,7 @@ These are the tools used to manage the repository itself
 - [ ] RBAC
 - [ ] [EKS PodIdentity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
 - [ ] ~~IDP~~ Just use IdentityCentre
+- [ ] [radar in-cluster deployment](https://github.com/skyhook-io/radar/blob/main/docs/in-cluster.md)?
 
 ## Productionising Alternatives
 

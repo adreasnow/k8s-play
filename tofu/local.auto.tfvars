@@ -1,3 +1,6 @@
+cluster_name   = "internal-staging"
+cluster_domain = "k8s.orb.local"
+
 flux_cluster_config = {
   cluster = {
     size   = "medium"

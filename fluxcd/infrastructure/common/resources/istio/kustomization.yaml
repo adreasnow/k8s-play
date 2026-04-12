@@ -6,3 +6,5 @@ resources:
   - 2-istiod.yaml
   - 3-cni.yaml
   - 4-ztunnel.yaml
+  - 5-gateway.yaml
+  - certificate.yaml

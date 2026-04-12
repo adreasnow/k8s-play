@@ -9,11 +9,9 @@ metadata:
 spec:
   wait: true
   inputs:
-    - name: namespaces-common
-      path: ./fluxcd/infrastructure/common/namespaces
-
     - name: istio
       path: ./fluxcd/infrastructure/common/resources/istio
+      deps: [cluster-issuer]
 
     - name: netowrking-extras
       path: ./fluxcd/infrastructure/common/resources/networking-extras
@@ -32,12 +30,6 @@ spec:
     - name: kro-definitions
       path: ./fluxcd/infrastructure/common/resources/kro-definitions
       deps: [kro, istio]
-      substituteFrom:
-        - name: cluster-vars
-
-    - name: traefik
-      path: ./fluxcd/infrastructure/common/resources/traefik
-      deps: [cluster-issuer, namespaces-common]
       substituteFrom:
         - name: cluster-vars
 

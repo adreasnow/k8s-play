@@ -1,5 +1,5 @@
 # # https://fluxoperator.dev/docs/crd/gitrepository/#github
-# resource "kubernetes_secret" "flux_github" {
+# resource "kubernetes_secret_v1" "flux_github" {
 #   # depends_on = [orbstack_k8s.cluster]
 
 #   metadata {
@@ -18,7 +18,7 @@
 # }
 
 # https://fluxoperator.dev/docs/crd/gitrepository/#ssh-authentication
-resource "kubernetes_secret" "flux_github" {
+resource "kubernetes_secret_v1" "flux_github" {
   # depends_on = [orbstack_k8s.cluster]
 
   metadata {

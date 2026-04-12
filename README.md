@@ -5,7 +5,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 ## Tool Requirements
 
 - [FluxCD](https://fluxcd.io/) - Lightweight, stateless, self-managed GitOps tool for k8s
-- [gh](https://cli.github.com) - Used for authenticating with GitHub
+- [gh](https://cli.github.com) - Used for authenticating with GitHub (only needed for key creation, but could be done manually)
 - Local k8s cluster - see [./docs/Create-k8s-cluster.md] for details/options
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - For managing k8s resources
 - [OrbStack](https://orbstack.dev)
@@ -16,6 +16,7 @@ This repo creates a minikube k8s cluster with multiple nodes. It sets up FluxCD 
 - [k9s](https://k9scli.io) - TUI for exploring/managing k8s resources
 - [flux9s](https://github.com/dgunzy/flux9s) - TUI or exploring/managing the status of FluxCD in a k9s way
 - [kubeconform](https://github.com/yannh/kubeconform) - validates that the yaml manifest meets the APIs it references
+- [radar](https://github.com/skyhook-io/radar) - REALLY useful cluster visualisation tool. k9s is great for service management, flux9s is great for flux state, but radar does everything and does it well!
 
 ## Base Tools used
 

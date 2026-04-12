@@ -10,7 +10,14 @@ docker run --rm -e RENOVATE_REPOSITORIES=adreasnow/k8s-play renovate/renovate --
 
 ## FluxCD
 
-1. Create a k8s CLuster
+### Tofu
+
+1. Create a k8s CLuster (ensure kubeconfig is properly configured)
+2. run from `tofu` - `tofu init && tofu apply`
+
+### Manual
+
+1. Create a k8s CLuster (ensure kubeconfig is properly configured)
 2. Install the Flux Operator via Helm
 
 ```bash

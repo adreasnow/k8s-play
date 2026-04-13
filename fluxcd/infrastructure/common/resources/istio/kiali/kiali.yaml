@@ -17,6 +17,6 @@ spec:
   targetNamespace: istio-system
   upgrade:
     cleanupOnFail: true
-  set:
-    - name: auth.strategy
-      value: anonymous
+  values:
+    auth:
+      strategy: anonymous

@@ -61,6 +61,7 @@ spec:
                     requests:
                       cpu: $${schema.spec.resources.requests.cpu}
                       memory: $${schema.spec.resources.requests.memory}
+
     - id: service
       template:
         apiVersion: v1
@@ -68,6 +69,7 @@ spec:
         metadata:
           name: $${schema.spec.name}
           labels:
+            istio.io/ingress-use-waypoint: "true"
             networking.istio.io/traffic-distribution: PreferSameZone # Prefer same AZ/same node endpoints (istio)
         spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
@@ -85,10 +87,9 @@ spec:
           name: $${schema.spec.name}
         spec:
           parentRefs:
+            - name: waypoint
             - name: istio-gateway
               namespace: istio-system
-              labels:
-                istio.io/waypoint-for: namespace
           hostnames:
             - $${schema.spec.hostname}.${domain}
           rules:

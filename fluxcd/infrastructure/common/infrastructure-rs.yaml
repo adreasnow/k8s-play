@@ -16,6 +16,9 @@ spec:
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
 
+    - name: gatewayApi
+      path: ./fluxcd/infrastructure/common/resources/gatewayApi
+
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer
       deps: [cert-manager]

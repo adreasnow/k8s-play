@@ -7,7 +7,7 @@
       interval: 10m
       timeout: 10m
       retryInterval: 1m
-      path: ./fluxcd/infrastructure/common/resources/istio
+      path: ./fluxcd/infrastructure/common/resources/istio/istio
       prune: false
       force: false
       wait: true

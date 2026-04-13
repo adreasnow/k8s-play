@@ -15,4 +15,4 @@
         kind: GitRepository
         name: flux-system
       dependsOn:
-        - name: istio
+        - name: istio-helm

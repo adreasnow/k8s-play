@@ -30,6 +30,8 @@ spec:
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces
       deps: [istio]
+      substituteFrom:
+        - name: cluster-vars
 
     - name: netowrking-extras
       path: ./fluxcd/infrastructure/common/resources/networking-extras

@@ -42,7 +42,8 @@ resource "helm_release" "flux_instance" {
 
 resource "kubernetes_config_map_v1" "cluster_vars" {
   metadata {
-    name = "cluster-vars"
+    name      = "cluster-vars"
+    namespace = helm_release.flux_operator.namespace
   }
 
   data = {

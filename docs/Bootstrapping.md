@@ -29,8 +29,8 @@ helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-opera
 3. Create the Git auth secret
 
 ```bash
-ssh-keygen -t ed25519 -C "ArgoCD Deploy Key" -N "" -f ./deploy-key
-gh repo deploy-key add ./deploy-key.pub --title "ArgoCD Deploy Key"
+ssh-keygen -t ed25519 -C "Deploy Key" -N "" -f ./deploy-key
+gh repo deploy-key add ./deploy-key.pub --title "Deploy Key"
 
 flux create secret git flux-system \
   --namespace=flux-system \

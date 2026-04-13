@@ -9,13 +9,9 @@ metadata:
 spec:
   wait: true
   inputs:
-    - name: istio
-      path: ./fluxcd/infrastructure/common/resources/istio
-      deps: [cluster-issuer]
 
-    - name: netowrking-extras
-      path: ./fluxcd/infrastructure/common/resources/networking-extras
-      deps: [istio]
+    - name: kro
+      path: ./fluxcd/infrastructure/common/resources/kro
 
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
@@ -24,8 +20,17 @@ spec:
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer
       deps: [cert-manager]
 
-    - name: kro
-      path: ./fluxcd/infrastructure/common/resources/kro
+    - name: istio
+      path: ./fluxcd/infrastructure/common/resources/istio
+      deps: [cluster-issuer]
+
+    - name: namespaces
+      path: ./fluxcd/infrastructure/common/resources/namespaces
+      deps: [istio]
+
+    - name: netowrking-extras
+      path: ./fluxcd/infrastructure/common/resources/networking-extras
+      deps: [istio]
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/common/resources/kro-definitions
@@ -35,7 +40,7 @@ spec:
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/common/resources/flux-operator-dashboard
-      deps: [traefik]
+      deps: [istio]
       substituteFrom:
         - name: cluster-vars
 

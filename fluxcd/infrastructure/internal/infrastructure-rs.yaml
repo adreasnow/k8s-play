@@ -11,8 +11,6 @@ spec:
   inputs:
     - name: common-infrastructure
       path: ./fluxcd/infrastructure/common
-    - name: namespaces
-      path: ./fluxcd/infrastructure/internal/namespaces
   resourcesTemplate: |
     ---
     apiVersion: kustomize.toolkit.fluxcd.io/v1

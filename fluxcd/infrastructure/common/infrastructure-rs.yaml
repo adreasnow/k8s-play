@@ -15,6 +15,7 @@ spec:
 
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
+      prune: true
 
     - name: gateway-api
       path: ./fluxcd/infrastructure/common/resources/gateway-api
@@ -30,6 +31,7 @@ spec:
     - name: kiali
       path: ./fluxcd/infrastructure/common/resources/kiali
       deps: [istio]
+      prune: true
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces
@@ -39,17 +41,20 @@ spec:
 
     - name: netowrking-extras
       path: ./fluxcd/infrastructure/common/resources/networking-extras
+      prune: true
       deps: [istio]
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/common/resources/kro-definitions
       deps: [kro, istio]
+      prune: true
       substituteFrom:
         - name: cluster-vars
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/common/resources/flux-operator-dashboard
       deps: [istio]
+      prune: true
       substituteFrom:
         - name: cluster-vars
 

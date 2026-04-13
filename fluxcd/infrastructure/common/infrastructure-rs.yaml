@@ -37,6 +37,8 @@ spec:
       path: ./fluxcd/infrastructure/common/resources/kiali-service
       deps: [kiali]
       prune: true
+      substituteFrom:
+        - name: cluster-vars
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces

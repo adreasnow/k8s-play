@@ -1,16 +1,32 @@
 
 locals {
   namespaces = [
-    { name = "demo", roles = [] },
+    { name = "demo", role = "" },
+    { name = "test", role = "" },
   ]
 }
 
-resource "kubernetes_config_map_v1" "app_namespaces" {
-  metadata {
-    name = "app-namespaces"
-  }
+resource "kubernetes_manifest" "app_namespaces_rsip" {
+  depends_on = [helm_release.flux_operator]
 
-  data = {
-    namespaces = yamlencode(local.namespaces)
+  for_each = { for ns in local.namespaces : ns.name => ns }
+
+  manifest = {
+    apiVersion = "fluxcd.controlplane.io/v1"
+    kind       = "ResourceSetInputProvider"
+    metadata = {
+      name      = "app-namespaces-${each.value.name}"
+      namespace = "flux-system"
+      labels = {
+        template = local.namespace-rsip-template-name
+      }
+    }
+    spec = {
+      type = "Static"
+      defaultValues = {
+        name = each.value.name
+        role = each.value.role
+      }
+    }
   }
 }

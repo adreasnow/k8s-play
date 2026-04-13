@@ -10,10 +10,11 @@ spec:
     annotations:
       fluxcd.controlplane.io/prune: enabled
   wait: true
-  inputs:
-    - configMap:
-        name: app-namespaces
-        key: namespaces
+  inputsFrom:
+    - kind: ResourceSetInputProvider
+      selector:
+        matchLabels:
+          template: ${namespace-rsip-template-name}
   resources:
     - apiVersion: v1
       kind: Namespace

@@ -47,7 +47,8 @@ resource "kubernetes_config_map_v1" "cluster_vars" {
   }
 
   data = {
-    domain = var.cluster_domain
-    name   = var.cluster_name
+    domain                       = var.cluster_domain
+    name                         = var.cluster_name
+    namespace-rsip-template-name = local.namespace-rsip-template-name
   }
 }

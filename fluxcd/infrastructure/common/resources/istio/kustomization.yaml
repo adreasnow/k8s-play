@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - istio-ks.yaml
+  - istio-helm-ks.yaml
   - gateway-ks.yaml
   - certificate-ks.yaml

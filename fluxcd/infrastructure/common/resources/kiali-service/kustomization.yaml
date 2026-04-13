@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - helmRepository.yaml
   - kiali-operator.yaml
-  - httpGateway.yaml

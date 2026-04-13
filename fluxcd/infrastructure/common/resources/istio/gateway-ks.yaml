@@ -1,0 +1,18 @@
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: istio-gateway
+      namespace: flux-system
+    spec:
+      interval: 10m
+      timeout: 10m
+      retryInterval: 1m
+      path: ./fluxcd/infrastructure/common/resources/istio/gateway
+      prune: false
+      force: false
+      wait: true
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+      dependsOn:
+        - name: istio-base

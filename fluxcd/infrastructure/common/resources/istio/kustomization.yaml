@@ -4,4 +4,3 @@ resources:
   - istio-helm-ks.yaml
   - gateway-ks.yaml
   - certificate-ks.yaml
-  - kiali-ks.yaml

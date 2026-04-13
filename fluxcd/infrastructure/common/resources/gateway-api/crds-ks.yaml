@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 1h
   sourceRef:
-    kind: OCIRepository
+    kind: GitRepository
     name: gateway-api
   path: ./config/crd/standard
   prune: false

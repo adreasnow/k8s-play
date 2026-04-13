@@ -16,8 +16,8 @@ spec:
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
 
-    - name: gatewayApi
-      path: ./fluxcd/infrastructure/common/resources/gatewayApi
+    - name: gateway-api
+      path: ./fluxcd/infrastructure/common/resources/gateway-api
 
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer
@@ -25,7 +25,7 @@ spec:
 
     - name: istio
       path: ./fluxcd/infrastructure/common/resources/istio
-      deps: [cluster-issuer]
+      deps: [cluster-issuer, gateway-api]
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces

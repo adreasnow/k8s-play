@@ -14,7 +14,7 @@ spec:
     - kind: ResourceSetInputProvider
       selector:
         matchLabels:
-          template: ${namespace-rsip-template-name}
+          template: ${namespaceRSIPTemplateName}
   resources:
     - apiVersion: v1
       kind: Namespace

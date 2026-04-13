@@ -1,12 +1,10 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
 metadata:
   name: gateway-api
   namespace: flux-system
 spec:
-  interval: 1m
-  url: https://github.com/kubernetes-sigs/gateway-api
+  interval: 1h
+  url: oci://ghcr.io/kubernetes-sigs/gateway-api/release-manifests
   ref:
-    semver: "v1.5.1"
-  ignore: |
-    /config/crd/README.md
+    tag: v1.5.1

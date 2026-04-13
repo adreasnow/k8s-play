@@ -10,7 +10,7 @@ spec:
     annotations:
       fluxcd.controlplane.io/prune: enabled
   wait: true
-  inputsFrom:
+  inputs:
     - configMap:
         name: app-namespaces
         key: namespaces

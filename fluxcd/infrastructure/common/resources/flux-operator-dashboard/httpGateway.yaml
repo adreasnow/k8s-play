@@ -5,8 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   parentRefs:
-    - name: traefik-gateway
-      namespace: traefik
+    - name: istio-gateway
+      namespace: istio-system
   hostnames:
     - flux-operator.admin.${domain}
   rules:

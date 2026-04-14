@@ -20,9 +20,8 @@ spec:
     - name: gateway-api
       path: ./fluxcd/infrastructure/common/resources/gateway-api
 
-    - name: caretta
-      path: ./fluxcd/infrastructure/common/resources/caretta
-
+    # - name: caretta
+    #   path: ./fluxcd/infrastructure/common/resources/caretta
 
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer

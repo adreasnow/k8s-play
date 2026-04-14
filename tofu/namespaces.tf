@@ -1,4 +1,3 @@
-
 locals {
   namespaces = [
     { name = "demo", role = "" },
@@ -6,6 +5,8 @@ locals {
   ]
 }
 
+# This resource creates ResourceSetInputProviders for each namespace
+# There is a ResourceSet that looks for these ResourceSetInputProviders to create namespaces based on the template
 resource "kubernetes_manifest" "app_namespaces_rsip" {
   depends_on = [helm_release.flux_operator]
 

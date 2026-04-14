@@ -15,16 +15,16 @@ spec:
 
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
-      prune: true
 
     - name: gateway-api
       path: ./fluxcd/infrastructure/common/resources/gateway-api
 
-    # - name: caretta
-    #   path: ./fluxcd/infrastructure/common/resources/caretta
+    - name: caretta
+      path: ./fluxcd/infrastructure/common/resources/caretta
 
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer
+      prune: false
       deps: [cert-manager]
 
     - name: istio
@@ -34,12 +34,10 @@ spec:
     - name: kiali
       path: ./fluxcd/infrastructure/common/resources/kiali
       deps: [istio]
-      prune: true
 
     - name: kiali-service
       path: ./fluxcd/infrastructure/common/resources/kiali-service
       deps: [kiali]
-      prune: true
       substituteFrom:
         - name: cluster-vars
 
@@ -51,20 +49,17 @@ spec:
 
     - name: netowrking-extras
       path: ./fluxcd/infrastructure/common/resources/networking-extras
-      prune: true
       deps: [istio]
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/common/resources/kro-definitions
       deps: [kro, istio]
-      prune: true
       substituteFrom:
         - name: cluster-vars
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/common/resources/flux-operator-dashboard
       deps: [istio]
-      prune: true
       substituteFrom:
         - name: cluster-vars
 
@@ -80,7 +75,7 @@ spec:
       timeout: 10m
       retryInterval: 1m
       path: << inputs.path >>
-      prune: << get inputs "prune" | default "false" >>
+      prune: << get inputs "prune" | default "true" >>
       force: << get inputs "force" | default "false" >>
       wait: true
       sourceRef:

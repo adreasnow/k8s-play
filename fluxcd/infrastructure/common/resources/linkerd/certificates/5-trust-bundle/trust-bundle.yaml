@@ -11,15 +11,15 @@ spec:
     # This is the Secret that cert-manager will update when it rotates
     # the trust anchor.
     - secret:
-        name: "linkerd-trust-anchor"
-        key: "tls.crt"
+        name: linkerd-trust-anchor
+        key: tls.crt
 
     # This is the Secret that we will use to hold the previous trust
     # anchor; we'll manually update this Secret after we're finished
     # restarting things.
     - secret:
-        name: "linkerd-previous-anchor"
-        key: "tls.crt"
+        name: linkerd-previous-anchor
+        key: tls.crt
 
   # This tells trust-manager the key to use when writing the trust
   # bundle into the ConfigMap. The target stanza doesn't have a way
@@ -27,7 +27,7 @@ spec:
   # a unique label on the control plane's namespace.
   target:
     configMap:
-      key: "ca-bundle.crt"
+      key: ca-bundle.crt
     namespaceSelector:
       matchLabels:
-        linkerd.io/is-control-plane: "true"
+        linkerd.io/is-control-plane: true

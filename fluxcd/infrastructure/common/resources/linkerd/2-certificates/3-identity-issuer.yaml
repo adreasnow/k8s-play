@@ -7,7 +7,7 @@ spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/3-identity-issuer
+  path: ./fluxcd/infrastructure/common/resources/linkerd/2-certificates/3-identity-issuer
   prune: false
   force: false
   wait: true

@@ -10,7 +10,10 @@ Below are some other helpful commands and tools for debugging what's going on.
 ## To force flux to reconcile
 
 ```bash
-flux reconcile kustomization flux-system --with-source
+flux reconcile source git flux-system --timeout=2m && \
+flux reconcile kustomization infrastructure --with-source --timeout=15m && \
+flux reconcile kustomization apps --with-source --timeout=15m
+
 ```
 
 ## To force the reconciliation of a specific manifest

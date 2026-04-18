@@ -8,7 +8,7 @@ spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/1-trust-root-issuer
+  path: ./fluxcd/infrastructure/common/resources/linkerd/2-certificates/1-trust-root-issuer
   prune: false
   force: false
   wait: true

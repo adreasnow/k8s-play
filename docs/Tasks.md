@@ -10,7 +10,7 @@ Below are some other helpful commands and tools for debugging what's going on.
 ## To force flux to reconcile
 
 ```bash
-flux reconcile source git flux-system && flux reconcile kustomization flux-system
+flux reconcile kustomization flux-system --with-source
 ```
 
 ## Diff your changes against main

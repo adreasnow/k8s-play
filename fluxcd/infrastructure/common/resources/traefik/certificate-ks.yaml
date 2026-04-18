@@ -16,6 +16,7 @@
         name: flux-system
       dependsOn:
         - name: traefik-namespace
+        - name: traefik-tls-cluster-issuer
       postBuild:
         substituteFrom:
           - kind: ConfigMap

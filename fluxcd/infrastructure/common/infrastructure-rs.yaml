@@ -37,20 +37,9 @@ spec:
     # - name: caretta
     #   path: ./fluxcd/infrastructure/common/resources/caretta
 
-
     # - name: istio
     #   path: ./fluxcd/infrastructure/common/resources/istio
     #   deps: [cluster-issuer, gateway-api]
-
-    # - name: kiali
-    #   path: ./fluxcd/infrastructure/common/resources/kiali
-    #   deps: [istio]
-
-    # - name: kiali-service
-    #   path: ./fluxcd/infrastructure/common/resources/kiali-service
-    #   deps: [kiali]
-    #   substituteFrom:
-    #     - name: cluster-vars
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces

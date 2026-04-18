@@ -16,23 +16,18 @@ spec:
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
 
-    - name: cluster-issuer
-      path: ./fluxcd/infrastructure/common/resources/cluster-issuer
-      prune: false
-      deps: [cert-manager]
-
     - name: gateway-api
       path: ./fluxcd/infrastructure/common/resources/gateway-api
 
     - name: traefik
       path: ./fluxcd/infrastructure/common/resources/traefik
       prune: false
-      deps: [cluster-issuer, gateway-api]
+      deps: [cert-manager, gateway-api]
 
     - name: linkerd
       path: ./fluxcd/infrastructure/common/resources/linkerd
       prune: false
-      deps: [cluster-issuer, gateway-api]
+      deps: [cert-manager, gateway-api]
 
     # - name: caretta
     #   path: ./fluxcd/infrastructure/common/resources/caretta

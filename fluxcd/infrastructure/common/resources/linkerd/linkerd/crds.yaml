@@ -19,3 +19,5 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  values:
+    cniEnabled: true

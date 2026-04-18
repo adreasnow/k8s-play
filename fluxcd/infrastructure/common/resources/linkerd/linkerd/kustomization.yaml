@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - helm-repository.yaml
   - crds.yaml
+  - cni-plugin.yaml
   - control-plane.yaml

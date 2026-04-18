@@ -21,8 +21,7 @@ spec:
       metadata:
         name: << inputs.name >>
         labels:
-          istio.io/dataplane-mode: ambient
-          istio.io/use-waypoint: waypoint
+          linkerd.io/inject: enabled
       spec:
         trafficDistribution: PreferClose
 

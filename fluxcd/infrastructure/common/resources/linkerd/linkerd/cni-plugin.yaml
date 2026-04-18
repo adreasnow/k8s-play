@@ -19,3 +19,8 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+    values:
+      # OrbStack uses k3s-based paths for CNI config/binaries
+      # TODO: remove these for EKS
+      destCNINetDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
+      destCNIBinDir: /var/lib/rancher/k3s/data/current/bin

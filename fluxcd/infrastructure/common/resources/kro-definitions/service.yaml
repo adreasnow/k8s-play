@@ -68,10 +68,6 @@ spec:
         kind: Service
         metadata:
           name: $${schema.spec.name}
-          labels:
-            istio.io/use-waypoint: waypoint
-            istio.io/ingress-use-waypoint: "true"
-            networking.istio.io/traffic-distribution: PreferSameZone # Prefer same AZ/same node endpoints (istio)
         spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:

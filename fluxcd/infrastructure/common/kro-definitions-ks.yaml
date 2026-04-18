@@ -17,6 +17,7 @@ spec:
   dependsOn:
     - name: kro
     - name: traefik
+    - name: linkerd
   postBuild:
     substituteFrom:
       - kind: ConfigMap

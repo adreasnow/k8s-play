@@ -22,7 +22,7 @@ spec:
 
     - name: linkerd-identity-issuer-cert
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/4-identity-issuer-cert
-      deps: [linkerd-identity-issuer-cert]
+      deps: [linkerd-identity-issuer]
 
     - name: linkerd-trust-bundle
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/5-trust-bundle

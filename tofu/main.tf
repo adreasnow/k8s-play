@@ -8,10 +8,19 @@ terraform {
       source  = "hashicorp/helm"
       version = "3.1.1"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.19.0"
+    }
   }
 }
 
 provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "orbstack"
+}
+
+provider "kubectl" {
   config_path    = "~/.kube/config"
   config_context = "orbstack"
 }

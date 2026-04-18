@@ -7,12 +7,12 @@ locals {
 
 # This resource creates ResourceSetInputProviders for each namespace
 # There is a ResourceSet that looks for these ResourceSetInputProviders to create namespaces based on the template
-resource "kubernetes_manifest" "app_namespaces_rsip" {
+resource "kubectl_manifest" "app_namespaces_rsip" {
   depends_on = [helm_release.flux_operator]
 
   for_each = { for ns in local.namespaces : ns.name => ns }
 
-  manifest = {
+  yaml_body = yamlencode({
     apiVersion = "fluxcd.controlplane.io/v1"
     kind       = "ResourceSetInputProvider"
     metadata = {
@@ -29,5 +29,5 @@ resource "kubernetes_manifest" "app_namespaces_rsip" {
         role = each.value.role
       }
     }
-  }
+  })
 }

@@ -13,6 +13,14 @@ Below are some other helpful commands and tools for debugging what's going on.
 flux reconcile kustomization flux-system --with-source
 ```
 
+## To force the reconciliation of a specific manifest
+
+This destoys and re-creates the resources, so use with caution
+
+```bash
+flux reconcile helmrelease linkerd-control-plane --force
+```
+
 ## Diff your changes against main
 
 ```bash

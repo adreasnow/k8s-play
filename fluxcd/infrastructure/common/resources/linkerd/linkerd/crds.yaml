@@ -17,7 +17,11 @@ spec:
   targetNamespace: linkerd
   install:
     createNamespace: true
+    remediation:
+      retries: 3
   upgrade:
     cleanupOnFail: true
+    remediation:
+      retries: 3
   values:
     cniEnabled: true

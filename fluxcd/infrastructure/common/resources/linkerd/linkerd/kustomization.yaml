@@ -6,3 +6,5 @@ resources:
   # TODO: Enable CNI for EKS
   # - cni-plugin.yaml
   - control-plane.yaml
+  - viz.yaml
+  - viz-gateway.yaml

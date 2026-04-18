@@ -24,6 +24,5 @@ spec:
     remediation:
       retries: 3
   values:
-    clusterDomain: ${domain}
     dashboard:
       enforcedHostRegexp: ".*"

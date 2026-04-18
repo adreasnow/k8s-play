@@ -16,7 +16,3 @@
         name: flux-system
       dependsOn:
         - name: linkerd-core
-      postBuild:
-        substituteFrom:
-          - kind: ConfigMap
-            name: cluster-vars

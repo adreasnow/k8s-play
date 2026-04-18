@@ -12,12 +12,15 @@ spec:
 
     - name: kro
       path: ./fluxcd/infrastructure/common/resources/kro
+      prune: false
 
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
+      prune: false
 
     - name: gateway-api
       path: ./fluxcd/infrastructure/common/resources/gateway-api
+      prune: false
 
     - name: traefik
       path: ./fluxcd/infrastructure/common/resources/traefik

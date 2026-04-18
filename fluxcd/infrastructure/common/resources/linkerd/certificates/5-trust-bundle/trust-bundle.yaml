@@ -14,12 +14,12 @@ spec:
         name: linkerd-trust-anchor
         key: tls.crt
 
-    # This is the Secret that we will use to hold the previous trust
-    # anchor; we'll manually update this Secret after we're finished
-    # restarting things.
-    - secret:
-        name: linkerd-previous-anchor
-        key: tls.crt
+    # # This is the Secret that we will use to hold the previous trust
+    # # anchor; we'll manually update this Secret after we're finished
+    # # restarting things.
+    # - secret:
+    #     name: linkerd-previous-anchor
+    #     key: tls.crt
 
   # This tells trust-manager the key to use when writing the trust
   # bundle into the ConfigMap. The target stanza doesn't have a way

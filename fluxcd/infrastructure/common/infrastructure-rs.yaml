@@ -29,8 +29,8 @@ spec:
       prune: false
       deps: [cert-manager, gateway-api]
 
-    # - name: caretta
-    #   path: ./fluxcd/infrastructure/common/resources/caretta
+    - name: caretta
+      path: ./fluxcd/infrastructure/common/resources/caretta
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces

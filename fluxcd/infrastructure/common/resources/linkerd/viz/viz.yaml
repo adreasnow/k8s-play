@@ -25,3 +25,4 @@ spec:
       retries: 3
   values:
     clusterDomain: ${domain}
+    enforcedHostRegexp: ".*"

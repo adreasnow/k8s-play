@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - viz.yaml
   - viz-gateway.yaml
-  - deployment-overrides.yaml

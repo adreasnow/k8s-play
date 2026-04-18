@@ -12,21 +12,21 @@ spec:
     - name: linkerd-trust-root-issuer
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/1-trust-root-issuer
 
-    - name: trust-anchor
+    - name: linkerd-trust-anchor
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/2-trust-anchor
       deps: [linkerd-trust-root-issuer]
 
-    - name: identity-issuer
+    - name: linkerd-identity-issuer
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/3-identity-issuer
-      deps: [trust-anchor]
+      deps: [linkerd-trust-anchor]
 
-    - name: identity-issuer-cert
+    - name: linkerd-identity-issuer-cert
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/4-identity-issuer-cert
-      deps: [identity-issuer-cert]
+      deps: [linkerd-identity-issuer-cert]
 
-    - name: trust-bundle
+    - name: linkerd-trust-bundle
       path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/5-trust-bundle
-      deps: [trust-bundle]
+      deps: [linkerd-trust-bundle]
 
   resourcesTemplate: |
     ---

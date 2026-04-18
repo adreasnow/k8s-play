@@ -29,6 +29,11 @@ spec:
       prune: false
       deps: [cluster-issuer, gateway-api]
 
+    - name: linkerd
+      path: ./fluxcd/infrastructure/common/resources/linkerd
+      prune: false
+      deps: [cluster-issuer, gateway-api]
+
     # - name: caretta
     #   path: ./fluxcd/infrastructure/common/resources/caretta
 

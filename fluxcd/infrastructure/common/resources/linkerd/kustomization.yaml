@@ -4,3 +4,4 @@ resources:
   - namespace-ks.yaml
   - certificates-ks.yaml
   - linkerd-ks.yaml
+  - viz-ks.yaml

@@ -16,30 +16,36 @@ spec:
     - name: cert-manager
       path: ./fluxcd/infrastructure/common/resources/cert-manager
 
-    - name: gateway-api
-      path: ./fluxcd/infrastructure/common/resources/gateway-api
-
-    - name: caretta
-      path: ./fluxcd/infrastructure/common/resources/caretta
-
     - name: cluster-issuer
       path: ./fluxcd/infrastructure/common/resources/cluster-issuer
       prune: false
       deps: [cert-manager]
 
-    - name: istio
-      path: ./fluxcd/infrastructure/common/resources/istio
+    - name: gateway-api
+      path: ./fluxcd/infrastructure/common/resources/gateway-api
+
+    - name: traefik
+      path: ./fluxcd/infrastructure/common/resources/traefik
+      prune: false
       deps: [cluster-issuer, gateway-api]
 
-    - name: kiali
-      path: ./fluxcd/infrastructure/common/resources/kiali
-      deps: [istio]
+    # - name: caretta
+    #   path: ./fluxcd/infrastructure/common/resources/caretta
 
-    - name: kiali-service
-      path: ./fluxcd/infrastructure/common/resources/kiali-service
-      deps: [kiali]
-      substituteFrom:
-        - name: cluster-vars
+
+    # - name: istio
+    #   path: ./fluxcd/infrastructure/common/resources/istio
+    #   deps: [cluster-issuer, gateway-api]
+
+    # - name: kiali
+    #   path: ./fluxcd/infrastructure/common/resources/kiali
+    #   deps: [istio]
+
+    # - name: kiali-service
+    #   path: ./fluxcd/infrastructure/common/resources/kiali-service
+    #   deps: [kiali]
+    #   substituteFrom:
+    #     - name: cluster-vars
 
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces

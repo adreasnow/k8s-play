@@ -1,0 +1,6 @@
+# TODO configure this to send metrics to otel
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: true

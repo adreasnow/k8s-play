@@ -16,13 +16,13 @@ flux reconcile source git flux-system && flux reconcile kustomization flux-syste
 ## Diff your changes against main
 
 ```bash
-flux diff kustomization flux-system --path=./fluxcd/clusters/staging
+flux diff kustomization flux-system --path=./fluxcd/clusters/internal
 ```
 
 ## Build the whole k8s manifest
 
 ```bash
-flux build kustomization flux-system --path=./fluxcd/clusters/staging
+flux build kustomization flux-system --path=./fluxcd/clusters/internal
 ```
 
 ## Check Status
@@ -45,7 +45,7 @@ kubectl -n flux-system port-forward svc/flux-operator 9080:9080
 ## To validate that kustomize can build flux
 
 ```bash
-kubectl kustomize clusters/staging | kubeconform -strict -summary \
+kubectl kustomize fluxcd/clusters/internal | kubeconform -strict -summary \
   -kubernetes-version 1.31.0 \
   -schema-location default \
   -skip CustomResourceDefinition \

@@ -89,9 +89,8 @@ spec:
           name: $${schema.spec.name}
         spec:
           parentRefs:
-            - name: waypoint
-            - name: istio-gateway
-              namespace: istio-system
+            - name: traefik-gateway # north-south
+              namespace: traefik
           hostnames:
             - $${schema.spec.hostname}.${domain}
           rules:

@@ -8,6 +8,6 @@ flux_cluster_config = {
   }
   sync = {
     ref  = "refs/heads/main" # TODO: pin to tag for progressive rollout
-    path = "fluxcd/clusters/internal-staging"
+    path = "fluxcd/clusters/internal"
   }
 }

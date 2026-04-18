@@ -23,7 +23,3 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  values:
-    # TODO: remove these for EKS (only needed for orbstack)
-    destCNINetDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
-    destCNIBinDir: /var/lib/rancher/k3s/data/current/bin

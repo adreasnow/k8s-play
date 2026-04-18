@@ -21,6 +21,16 @@ This destoys and re-creates the resources, so use with caution
 flux reconcile helmrelease linkerd-control-plane --force
 ```
 
+## To re-create a failed flux helm installed chart
+
+```bash
+helm list -n flux-system
+
+helm uninstall <chart name> -n flux-system
+
+flux reconcile helmrelease <flux helmRelease name> --force
+```
+
 ## Diff your changes against main
 
 ```bash

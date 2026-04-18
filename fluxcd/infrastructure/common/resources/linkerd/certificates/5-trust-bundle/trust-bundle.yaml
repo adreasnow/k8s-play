@@ -30,4 +30,4 @@ spec:
       key: ca-bundle.crt
     namespaceSelector:
       matchLabels:
-        linkerd.io/is-control-plane: true
+        linkerd.io/is-control-plane: "true"

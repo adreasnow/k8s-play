@@ -7,7 +7,8 @@ spec:
   interval: 10m
   dependsOn:
     - name: linkerd-crds
-    - name: linkerd-cni
+    # TODO: Enable CNI for EKS
+    # - name: linkerd-cni
   chart:
     spec:
       chart: linkerd-control-plane

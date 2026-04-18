@@ -37,29 +37,24 @@ spec:
     # - name: caretta
     #   path: ./fluxcd/infrastructure/common/resources/caretta
 
-    # - name: istio
-    #   path: ./fluxcd/infrastructure/common/resources/istio
-    #   deps: [cluster-issuer, gateway-api]
-
     - name: namespaces
       path: ./fluxcd/infrastructure/common/resources/namespaces
-      deps: [istio]
+      deps: [linkerd]
       substituteFrom:
         - name: cluster-vars
 
     - name: netowrking-extras
       path: ./fluxcd/infrastructure/common/resources/networking-extras
-      deps: [istio]
 
     - name: kro-definitions
       path: ./fluxcd/infrastructure/common/resources/kro-definitions
-      deps: [kro, istio]
+      deps: [kro, traefik]
       substituteFrom:
         - name: cluster-vars
 
     - name: flux-operator-dashboard
       path: ./fluxcd/infrastructure/common/resources/flux-operator-dashboard
-      deps: [istio]
+      deps: [traefik]
       substituteFrom:
         - name: cluster-vars
 

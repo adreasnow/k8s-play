@@ -30,7 +30,6 @@ These are the tools used to manage the repository itself
 ## Services exposed
 
 - Demo app - [https://demo.k8s.orb.local]
-- Kiali (istio) dasboard - [https://kiali.admin.k8s.orb.local]
 - Flux-Operator Dashboard - [https://flux-operator.admin.k8s.orb.local]
 
 ## Productionising Alternatives

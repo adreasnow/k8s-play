@@ -10,22 +10,22 @@ spec:
   wait: true
   inputs:
     - name: linkerd-trust-root-issuer
-      path: ./fluxcd/infrastructure/common/resources/cert-manager/linkerd/1-trust-root-issuer
+      path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/1-trust-root-issuer
 
     - name: trust-anchor
-      path: ./fluxcd/infrastructure/common/resources/cert-manager/linkerd/2-trust-anchor
+      path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/2-trust-anchor
       deps: [linkerd-trust-root-issuer]
 
     - name: identity-issuer
-      path: ./fluxcd/infrastructure/common/resources/cert-manager/linkerd/3-identity-issuer
+      path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/3-identity-issuer
       deps: [trust-anchor]
 
     - name: identity-issuer-cert
-      path: ./fluxcd/infrastructure/common/resources/cert-manager/linkerd/4-identity-issuer-cert
+      path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/4-identity-issuer-cert
       deps: [identity-issuer-cert]
 
     - name: trust-bundle
-      path: ./fluxcd/infrastructure/common/resources/cert-manager/linkerd/5-trust-bundle
+      path: ./fluxcd/infrastructure/common/resources/linkerd/certificates/5-trust-bundle
       deps: [trust-bundle]
 
   resourcesTemplate: |

@@ -5,4 +5,4 @@ resources:
   - certificates-ks.yaml
   - linkerd-ks.yaml
   - viz-ks.yaml
-  - viz-gateways-ks.yaml
+  - viz-gateway-ks.yaml

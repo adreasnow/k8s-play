@@ -16,7 +16,7 @@ spec:
       interval: 1h
   targetNamespace: linkerd-viz
   install:
-    createNamespace: false
+    createNamespace: true
     remediation:
       retries: 3
   upgrade:

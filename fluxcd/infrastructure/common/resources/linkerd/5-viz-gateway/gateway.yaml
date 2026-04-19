@@ -19,6 +19,18 @@ spec:
         - name: web
           port: 8084
 ---
+apiVersion: policy.linkerd.io/v1beta1
+kind: Server
+metadata:
+  name: linkerd-viz
+  namespace: linkerd-viz
+spec:
+  podSelector:
+    matchLabels:
+      app: linkerd-viz
+  port: 8084
+  proxyProtocol: HTTP/2
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

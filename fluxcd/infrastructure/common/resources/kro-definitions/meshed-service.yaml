@@ -170,7 +170,7 @@ spec:
 
     - id: eastWestHTTPRoute
       includeWhen:
-        - ${schema.spec.ingress.enabled.internal}
+        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute

@@ -33,7 +33,7 @@ spec:
         imagePullPolicy: string | default=Always
         ports: "[]Port"
 
-      ingess:
+      ingress:
         hostname: string | required=false
         path: string | default=/
         enabled:

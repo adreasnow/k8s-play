@@ -34,3 +34,7 @@ spec:
       externalCA: true
       issuer:
         scheme: kubernetes.io/tls
+
+    # TODO: Disable for EKS
+    proxyInit:
+      runAsRoot: true

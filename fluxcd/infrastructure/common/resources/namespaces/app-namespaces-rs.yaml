@@ -20,6 +20,5 @@ spec:
       kind: MeshedNamespace
       metadata:
         name: << inputs.name >>
-        namespace: flux-system
       spec:
         name: << inputs.name >>

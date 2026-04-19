@@ -6,6 +6,7 @@ spec:
   schema:
     apiVersion: v1alpha1
     kind: Service
+    scope: Namespaced
     types:
       Port:
         port: integer | required=true
@@ -52,15 +53,23 @@ spec:
           memory: string | required=true
 
   resources:
+    - id: clusterVars
+      externalRef:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: cluster-vars
+          namespace: flux-operator
+
     - id: deployment
       template:
         apiVersion: apps/v1
         kind: Deployment
         metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}
+          namespace: ${schema.metadata.namespace}
         spec:
-          replicas: $${schema.spec.replicas}
+          replicas: ${schema.spec.replicas}
           selector:
             matchLabels:
               app: deployment
@@ -77,17 +86,17 @@ spec:
                     matchLabels:
                       app: deployment
               containers:
-                - name: $${schema.spec.name}-deployment
-                  image: $${schema.spec.image}
-                  imagePullPolicy: $${schema.spec.imagePullPolicy}
-                  ports: '$${schema.spec.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
+                - name: ${schema.spec.name}-deployment
+                  image: ${schema.spec.image}
+                  imagePullPolicy: ${schema.spec.imagePullPolicy}
+                  ports: '${schema.spec.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
                   resources:
                     limits:
-                      cpu: $${schema.spec.resources.limits.cpu}
-                      memory: $${schema.spec.resources.limits.memory}
+                      cpu: ${schema.spec.resources.limits.cpu}
+                      memory: ${schema.spec.resources.limits.memory}
                     requests:
-                      cpu: $${schema.spec.resources.requests.cpu}
-                      memory: $${schema.spec.resources.requests.memory}
+                      cpu: ${schema.spec.resources.requests.cpu}
+                      memory: ${schema.spec.resources.requests.memory}
                   securityContext:
                     runAsNonRoot: true
                     allowPrivilegeEscalation: false
@@ -101,77 +110,77 @@ spec:
         apiVersion: v1
         kind: Service
         metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}
+          namespace: ${schema.metadata.namespace}
         spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
             app: deployment
-          ports: $${schema.spec.ports}
+          ports: ${schema.spec.ports}
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:
         apiVersion: v1
         kind: ServiceAccount
         metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}
+          namespace: ${schema.metadata.namespace}
         automountServiceAccountToken: false
 
     - id: northSoutHTTPRoute
       includeWhen:
-        - $${schema.spec.ingress.enabled.externally}
+        - ${schema.spec.ingress.enabled.externally}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
         metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}
+          namespace: ${schema.metadata.namespace}
         spec:
           parentRefs:
             - name: traefik-gateway # north-south
               namespace: traefik
               sectionName: websecure
           hostnames:
-            - $${schema.spec.hostname}.${domain}
+            - ${schema.spec.hostname}.${clusterVars.data.?domain}
           rules:
             - matches:
                 - path:
                     type: PathPrefix
-                    value: $${schema.spec.ingressPath}
+                    value: ${schema.spec.ingressPath}
               backendRefs:
-                - name: $${schema.spec.name}
-                  port: $${schema.spec.ports[0].port}
+                - name: ${schema.spec.name}
+                  port: ${schema.spec.ports[0].port}
 
     ## Linkerd mTLS polcies
     - id: linkerdServer
       includeWhen:
-        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
       template:
         apiVersion: policy.linkerd.io/v1beta1
         kind: Server
         metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}
+          namespace: ${schema.metadata.namespace}
         spec:
           podSelector:
             matchLabels:
-              app: $${schema.spec.name}
-          port: $${schema.spec.ports[0].port}
+              app: ${schema.spec.name}
+          port: ${schema.spec.ports[0].port}
           proxyProtocol: HTTP/2
 
     - id: eastWestHTTPRoute
       includeWhen:
-        - $${schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.internally}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
         metadata:
-          name: $${schema.spec.name}-mesh-route
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}-mesh-route
+          namespace: ${schema.metadata.namespace}
         spec:
           parentRefs:
-            - name: $${schema.spec.name}
+            - name: ${schema.spec.name}
               kind: Service
               group: policy.linkerd.io
           rules:
@@ -179,35 +188,35 @@ spec:
                 - path:
                     type: PathPrefix
                     # must include healthchecks
-                    value: $${schema.spec.ingressPath}
+                    value: ${schema.spec.ingressPath}
 
     - id: authenticateAllMeshedClients
       includeWhen:
-        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
       template:
         apiVersion: policy.linkerd.io/v1alpha1
         kind: MeshTLSAuthentication
         metadata:
-          name: $${schema.spec.name}-all-meshed-clients
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}-all-meshed-clients
+          namespace: ${schema.metadata.namespace}
         spec:
           identities:
             - "*"
 
     - id: authorizeAllMeshedClientsToAccessMyHTTPRoute
       includeWhen:
-        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
       template:
         apiVersion: policy.linkerd.io/v1alpha1
         kind: AuthorizationPolicy
         metadata:
-          name: $${schema.spec.name}-allow-mesh
-          namespace: $${schema.metadata.namespace}
+          name: ${schema.spec.name}-allow-mesh
+          namespace: ${schema.metadata.namespace}
         spec:
           targetRef:
             group: policy.linkerd.io
             kind: HTTPRoute
-            name: $${schema.spec.name}-mesh-route
+            name: ${schema.spec.name}-mesh-route
           requiredAuthenticationRefs:
             - name: all-meshed-clients # this is defined in the namespace object
               kind: MeshTLSAuthentication

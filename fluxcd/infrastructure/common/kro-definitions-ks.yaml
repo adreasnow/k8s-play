@@ -18,7 +18,3 @@ spec:
     - name: kro
     - name: traefik
     - name: linkerd
-  postBuild:
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars

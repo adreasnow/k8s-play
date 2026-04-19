@@ -28,7 +28,7 @@ spec:
     spec:
       name: string | required=true
       replicas: integer | default=2
-      continer:
+      container:
         image: string | required=true
         imagePullPolicy: string | default=Always
         ports: "[]Port"

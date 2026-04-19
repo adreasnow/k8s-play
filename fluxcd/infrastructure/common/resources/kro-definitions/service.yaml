@@ -152,7 +152,7 @@ spec:
     ## Linkerd mTLS policies
     - id: linkerdServer
       includeWhen:
-        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internal}
       template:
         apiVersion: policy.linkerd.io/v1beta1
         kind: Server
@@ -167,7 +167,7 @@ spec:
 
     - id: eastWestHTTPRoute
       includeWhen:
-        - ${schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.internal}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
@@ -187,7 +187,7 @@ spec:
 
     - id: authenticateAllMeshedClients
       includeWhen:
-        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internal}
       template:
         apiVersion: policy.linkerd.io/v1alpha1
         kind: MeshTLSAuthentication
@@ -199,7 +199,7 @@ spec:
 
     - id: authorizeAllMeshedClientsToAccessMyHTTPRoute
       includeWhen:
-        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+        - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internal}
       template:
         apiVersion: policy.linkerd.io/v1alpha1
         kind: AuthorizationPolicy

@@ -75,7 +75,7 @@ spec:
           ports: $${schema.spec.ports}
 
     # north-south
-    - id: gatewayHttpRoute
+    - id: httpRoute
       includeWhen:
         - $${schema.spec.hostname.size() > 0}
       template:
@@ -107,11 +107,16 @@ spec:
           name: $${schema.spec.name}-mesh
         spec:
           parentRefs:
-            - name: waypoint
+            - group: ""
+              kind: Service
+              name: $${schema.spec.name}
+              port: $${schema.spec.ports[0].port}
           rules:
             - backendRefs:
                 - name: $${schema.spec.name}
                   port: $${schema.spec.ports[0].port}
+              timeouts:
+                request: 10s
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:
@@ -121,3 +126,56 @@ spec:
           name: $${schema.spec.name}
           namespace: $${schema.metadata.namespace}
         automountServiceAccountToken: false
+
+    # Who is allowed to call my-app
+    - apiVersion: policy.linkerd.io/v1beta3
+      kind: Server
+      metadata:
+        name: $${schema.spec.name}
+        namespace: $${schema.metadata.namespace}
+      spec:
+        podSelector:
+          matchLabels:
+            app: $${schema.spec.name}
+        port: $${schema.spec.ports[0].port}
+        proxyProtocol: HTTP/2
+
+    - apiVersion: policy.linkerd.io/v1beta3
+      kind: HTTPRoute
+      metadata:
+        name: my-app-authz-route
+        namespace: my-app
+      spec:
+        parentRefs:
+          - name: $${schema.spec.name}
+            kind: Server
+            group: policy.linkerd.io
+        # rules:
+        #   - matches:
+        #       - path:
+        #           type: PathPrefix
+        #           value: /api
+
+    - apiVersion: policy.linkerd.io/v1beta3
+      kind: AuthorizationPolicy
+      metadata:
+        name: $${schema.spec.name}-allow-traefik
+        namespace: $${schema.metadata.namespace}
+      spec:
+        targetRef:
+          group: policy.linkerd.io
+          kind: HTTPRoute
+          name: $${schema.spec.name}-authz-route
+        requiredAuthenticationRefs:
+          - name: traefik-sa
+            kind: MeshTLSAuthentication
+            group: policy.linkerd.io
+
+    - apiVersion: policy.linkerd.io/v1beta3
+      kind: MeshTLSAuthentication
+      metadata:
+        name: traefik-sa
+        namespace: $${schema.metadata.namespace}
+      spec:
+        identities:
+          - "traefik-traefik.traefik.serviceaccount.identity.linkerd.cluster.local"

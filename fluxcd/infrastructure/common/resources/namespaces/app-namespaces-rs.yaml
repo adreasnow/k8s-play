@@ -20,7 +20,7 @@ spec:
       kind: Namespace
       metadata:
         name: << inputs.name >>
-        labels:
+        annotations:
           linkerd.io/inject: enabled
       spec:
         trafficDistribution: PreferClose

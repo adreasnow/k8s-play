@@ -1,9 +1,6 @@
 deployment:
   replicas: 3 # match the number of AZs
 
-podAnnotations:
-  linkerd.io/inject: ingress
-
 topologySpreadConstraints:
   - maxSkew: 1
     topologyKey: topology.kubernetes.io/zone

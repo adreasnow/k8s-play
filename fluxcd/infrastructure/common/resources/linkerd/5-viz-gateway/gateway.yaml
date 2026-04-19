@@ -27,7 +27,8 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: linkerd-viz
+      component: web
+      linkerd.io/extension: viz
   port: 8084
   proxyProtocol: HTTP/2
 ---

@@ -5,3 +5,4 @@ metadata:
   annotations:
     linkerd.io/inject: ingress
     config.linkerd.io/skip-inbound-ports: "30001,30000"
+    config.linkerd.io/skip-outbound-ports: "443"

@@ -1,9 +1,5 @@
 deployment:
   replicas: 3 # match the number of AZs
-  annotations:
-    # Skip port 443 outbound so Traefik can talk to the K8s API server
-    # directly (for its own service discovery) without going through the proxy.
-    config.linkerd.io/skip-outbound-ports: "443"
 
 podAnnotations:
   linkerd.io/inject: ingress

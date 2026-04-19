@@ -4,7 +4,3 @@ metadata:
   name: linkerd-viz
   annotations:
     linkerd.io/inject: enabled
-  labels:
-    pod-security.kubernetes.io/enforce: baseline
-    pod-security.kubernetes.io/warn: restricted
-    pod-security.kubernetes.io/audit: restricted

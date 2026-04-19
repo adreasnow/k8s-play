@@ -5,7 +5,7 @@ metadata:
 spec:
   schema:
     apiVersion: v1alpha1
-    kind: Service
+    kind: MeshedService
     scope: Namespaced
     types:
       Port:
@@ -41,7 +41,7 @@ spec:
           internal: boolean | default=false
 
 
-      livelinessProbe: Probe | required=false
+      livenessProbe: Probe | required=false
       startupProbe: Probe | required=false
       readinessProbe: Probe | required=false
 
@@ -72,11 +72,11 @@ spec:
           replicas: ${schema.spec.replicas}
           selector:
             matchLabels:
-              app: deployment
+              app: ${schema.spec.name}
           template:
             metadata:
               labels:
-                app: deployment
+                app: ${schema.spec.name}
             spec:
               topologySpreadConstraints:
                 - maxSkew: 1
@@ -84,9 +84,9 @@ spec:
                   whenUnsatisfiable: ScheduleAnyway
                   labelSelector:
                     matchLabels:
-                      app: deployment
+                      app: ${schema.spec.name}
               containers:
-                - name: ${schema.spec.name}-deployment
+                - name: ${schema.spec.name}
                   image: ${schema.spec.container.image}
                   imagePullPolicy: ${schema.spec.container.imagePullPolicy}
                   ports: '${schema.spec.container.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
@@ -105,7 +105,7 @@ spec:
                     capabilities:
                       drop: ["ALL"]
 
-    - id: service
+    - id: svc
       template:
         apiVersion: v1
         kind: Service
@@ -114,8 +114,8 @@ spec:
         spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
-            app: deployment
-          ports: ${schema.spec.container.ports}
+            app: ${schema.spec.name}
+          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "targetPort": p.port, "protocol": p.protocol})}'
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:
@@ -125,7 +125,7 @@ spec:
           name: ${schema.spec.name}
         automountServiceAccountToken: false
 
-    - id: northSoutHTTPRoute
+    - id: northSouthHTTPRoute
       includeWhen:
         - ${schema.spec.ingress.enabled.externally}
       template:
@@ -139,7 +139,7 @@ spec:
               namespace: traefik
               sectionName: websecure
           hostnames:
-            - ${schema.spec.ingress.hostname}.${clusterVars.data.?domain}
+            - ${schema.spec.ingress.hostname + "." + clusterVars.data.?domain.orValue("")}
           rules:
             - matches:
                 - path:
@@ -149,7 +149,7 @@ spec:
                 - name: ${schema.spec.name}
                   port: ${schema.spec.container.ports[0].port}
 
-    ## Linkerd mTLS polcies
+    ## Linkerd mTLS policies
     - id: linkerdServer
       includeWhen:
         - ${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
@@ -176,7 +176,7 @@ spec:
         spec:
           parentRefs:
             - name: ${schema.spec.name}
-              kind: Service
+              kind: Server
               group: policy.linkerd.io
           rules:
             - matches:
@@ -211,6 +211,6 @@ spec:
             kind: HTTPRoute
             name: ${schema.spec.name}-mesh-route
           requiredAuthenticationRefs:
-            - name: all-meshed-clients # this is defined in the namespace object
+            - name: ${authenticateAllMeshedClients.metadata.name}
               kind: MeshTLSAuthentication
               group: policy.linkerd.io

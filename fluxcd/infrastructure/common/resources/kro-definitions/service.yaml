@@ -90,7 +90,7 @@ spec:
                 - name: ${schema.spec.name}-deployment
                   image: ${schema.spec.container.image}
                   imagePullPolicy: ${schema.spec.container.imagePullPolicy}
-                  ports: '${schema.spec.contianer.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
+                  ports: '${schema.spec.container.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
                   resources:
                     limits:
                       cpu: ${schema.spec.resources.limits.cpu}
@@ -117,7 +117,7 @@ spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
             app: deployment
-          ports: ${schema.spec.contianer.ports}
+          ports: ${schema.spec.container.ports}
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:
@@ -151,7 +151,7 @@ spec:
                     value: ${schema.spec.ingress.path}
               backendRefs:
                 - name: ${schema.spec.name}
-                  port: ${schema.spec.contianer.ports[0].port}
+                  port: ${schema.spec.container.ports[0].port}
 
     ## Linkerd mTLS polcies
     - id: linkerdServer
@@ -167,7 +167,7 @@ spec:
           podSelector:
             matchLabels:
               app: ${schema.spec.name}
-          port: ${schema.spec.contianer.ports[0].port}
+          port: ${schema.spec.container.ports[0].port}
           proxyProtocol: HTTP/2
 
     - id: eastWestHTTPRoute

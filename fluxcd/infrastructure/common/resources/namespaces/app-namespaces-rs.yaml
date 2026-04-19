@@ -25,6 +25,7 @@ spec:
       spec:
         trafficDistribution: PreferClose
 
+
     # Allows pods in the same namespace to communicate with each other
     - apiVersion: networking.k8s.io/v1
       kind: NetworkPolicy
@@ -41,62 +42,82 @@ spec:
                   matchLabels:
                     kubernetes.io/metadata.name: << inputs.name >>
 
-      # Blocks egress to system namespaces
-    - apiVersion: networking.k8s.io/v1
-      kind: NetworkPolicy
-      metadata:
-        name: block-system-namespace-egress
-        namespace: << inputs.name >>
-      spec:
-        podSelector: {}
-        policyTypes:
-          - Egress
-        egress:
-          - to:
-              - namespaceSelector:
-                  matchExpressions:
-                    - key: kubernetes.io/metadata.name
-                      operator: NotIn
-                      values:
-                        - kube-system
-                        - kube-public
-                        - kube-node-lease
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-egress
+  namespace: my-app
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    # All external traffic (internet)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
 
-      # Allow DNS resolution for the namespace
-    - apiVersion: networking.k8s.io/v1
-      kind: NetworkPolicy
-      metadata:
-        name: allow-dns-egress
-        namespace: << inputs.name >>
-      spec:
-        podSelector: {}
-        policyTypes:
-          - Egress
-        egress:
-          - to:
-              - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: kube-system
-                podSelector:
-                  matchLabels:
-                    k8s-app: kube-dns
-            ports:
-              - port: 53
-                protocol: UDP
-              - port: 53
-                protocol: TCP
+    # kubeDNS — required or nothing resolves
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
 
-      # Allow egress to external networks
-      # Does not overwrite existing DENY rules
-      # all east-west traffic still goes through Istio with STRICT routing
+    # Linkerd control plane — required for mTLS cert issuance + policy updates
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              linkerd.io/control-plane-ns: linkerd
+      ports:
+        - protocol: TCP
+          port: 8086   # destination service
+        - protocol: TCP
+          port: 8080   # identity service
+        - protocol: TCP
+          port: 8090   # policy controller
+
     - apiVersion: networking.k8s.io/v1
       kind: NetworkPolicy
       metadata:
-        name: allow-egress
+        name: allow-kubelet-probes
         namespace: << inputs.name >>
       spec:
         podSelector: {}
         policyTypes:
-          - Egress
-        egress:
-          - {} # Empty rule = allow all egress
+          - Ingress
+        ingress:
+          - from:
+              - ipBlock:
+                  cidr: 192.168.0.0/16  # TODO: replace with EKS node CIDR
+
+    # # TODO: Enable once on EKS
+    # - apiVersion: networking.k8s.io/v1
+    #   kind: NetworkPolicy
+    #   metadata:
+    #     name: allow-api-server-to-proxy-injector
+    #     namespace: linkerd
+    #   spec:
+    #     podSelector:
+    #       matchLabels:
+    #         linkerd.io/control-plane-component: proxy-injector
+    #     policyTypes:
+    #       - Ingress
+    #     ingress:
+    #       - from:
+    #           - ipBlock:
+    #               cidr: <EKS_CONTROL_PLANE_IP>/32
+    #         ports:
+    #           - protocol: TCP
+    #             port: 443

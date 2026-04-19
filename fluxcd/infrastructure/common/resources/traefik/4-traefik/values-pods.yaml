@@ -1,14 +1,18 @@
 deployment:
   replicas: 3 # match the number of AZs
+  annotations:
+    linkerd.io/inject: ingress
+    # Skip port 443 outbound so Traefik can talk to the K8s API server
+    # directly (for its own service discovery) without going through the proxy.
+    config.linkerd.io/skip-outbound-ports: "443"
 
-# # One Traefik per AZ
-# topologySpreadConstraints:
-#   - maxSkew: 1
-#     topologyKey: topology.kubernetes.io/zone
-#     whenUnsatisfiable: DoNotSchedule
-#     labelSelector:
-#       matchLabels:
-#         app.kubernetes.io/name: traefik
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: traefik
 
 # Pod disruption budget
 podDisruptionBudget:

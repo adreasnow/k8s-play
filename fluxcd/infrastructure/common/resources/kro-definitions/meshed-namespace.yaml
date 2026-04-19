@@ -25,23 +25,6 @@ spec:
             pod-security.kubernetes.io/warn: restricted
             pod-security.kubernetes.io/audit: restricted
 
-    - id: allowSameNamespaceCommunication
-      template:
-        apiVersion: networking.k8s.io/v1
-        kind: NetworkPolicy
-        metadata:
-          name: allow-same-namespace-communication
-          namespace: ${ns.metadata.name}
-        spec:
-          podSelector: {}
-          policyTypes:
-            - Ingress
-          ingress:
-            - from:
-                - namespaceSelector:
-                    matchLabels:
-                      kubernetes.io/metadata.name: ${schema.spec.name}
-
     - id: egressPolicyAllowExternalTraffic
       template:
         apiVersion: networking.k8s.io/v1

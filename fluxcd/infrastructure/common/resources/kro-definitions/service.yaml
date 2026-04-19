@@ -26,20 +26,20 @@ spec:
         failureThreshold: integer | default=3
 
     spec:
+      name: string | required=true
+      replicas: integer | default=2
       continer:
-        name: string | required=true
-        replicas: integer | default=2
         image: string | required=true
         imagePullPolicy: string | default=Always
+        ports: "[]Port"
 
       ingess:
         hostname: string | required=false
-        ingressPath: string | default=/
+        path: string | default=/
         enabled:
           externally: boolean | default=false
           internal: boolean | default=false
 
-      ports: "[]Port"
 
       livelinessProbe: Probe | required=false
       startupProbe: Probe | required=false
@@ -88,9 +88,9 @@ spec:
                       app: deployment
               containers:
                 - name: ${schema.spec.name}-deployment
-                  image: ${schema.spec.image}
-                  imagePullPolicy: ${schema.spec.imagePullPolicy}
-                  ports: '${schema.spec.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
+                  image: ${schema.spec.container.image}
+                  imagePullPolicy: ${schema.spec.container.imagePullPolicy}
+                  ports: '${schema.spec.contianer.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
                   resources:
                     limits:
                       cpu: ${schema.spec.resources.limits.cpu}
@@ -117,7 +117,7 @@ spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
             app: deployment
-          ports: ${schema.spec.ports}
+          ports: ${schema.spec.contianer.ports}
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:
@@ -143,15 +143,15 @@ spec:
               namespace: traefik
               sectionName: websecure
           hostnames:
-            - ${schema.spec.hostname}.${clusterVars.data.?domain}
+            - ${schema.spec.ingress.hostname}.${clusterVars.data.?domain}
           rules:
             - matches:
                 - path:
                     type: PathPrefix
-                    value: ${schema.spec.ingressPath}
+                    value: ${schema.spec.ingress.path}
               backendRefs:
                 - name: ${schema.spec.name}
-                  port: ${schema.spec.ports[0].port}
+                  port: ${schema.spec.contianer.ports[0].port}
 
     ## Linkerd mTLS polcies
     - id: linkerdServer
@@ -167,7 +167,7 @@ spec:
           podSelector:
             matchLabels:
               app: ${schema.spec.name}
-          port: ${schema.spec.ports[0].port}
+          port: ${schema.spec.contianer.ports[0].port}
           proxyProtocol: HTTP/2
 
     - id: eastWestHTTPRoute
@@ -189,7 +189,7 @@ spec:
                 - path:
                     type: PathPrefix
                     # must include healthchecks
-                    value: ${schema.spec.ingressPath}
+                    value: ${schema.spec.ingress.path}
 
     - id: authenticateAllMeshedClients
       includeWhen:

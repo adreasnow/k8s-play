@@ -3,6 +3,4 @@ kind: Kustomization
 resources:
   - helm-repository.yaml
   - crds.yaml
-  # TODO: Enable CNI for EKS
-  # - cni-plugin.yaml
   - control-plane.yaml

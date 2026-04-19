@@ -7,8 +7,6 @@ spec:
   interval: 10m
   dependsOn:
     - name: linkerd-crds
-    # TODO: Enable CNI for EKS
-    # - name: linkerd-cni
   chart:
     spec:
       chart: linkerd-control-plane
@@ -28,8 +26,6 @@ spec:
     remediation:
       retries: 3
   values:
-    # TODO: Enable CNI for EKS
-    # cniEnabled: true
     identity:
       externalCA: true
       issuer:

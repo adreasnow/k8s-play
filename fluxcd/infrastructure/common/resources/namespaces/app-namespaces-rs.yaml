@@ -17,7 +17,7 @@ spec:
           template: ${namespaceRSIPTemplateName}
   resources:
     - apiVersion: kro.run/v1alpha1
-      kind: RestrictedNamespace
+      kind: MeshedNamespace
       metadata:
         name: << inputs.name >>
         namespace: flux-system

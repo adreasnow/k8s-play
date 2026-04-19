@@ -10,13 +10,39 @@ spec:
       Port:
         port: integer | required=true
         protocol: string | required=true
+      Probe:
+        httpGet:
+          path: string | required=true
+          port: integer | required=true
+          httpHeaders:
+            - name: Accept
+              value: application/json
+
+        initialDelaySeconds: integer | default=15
+        periodSeconds: integer | default=5
+        timeoutSeconds: integer | default=3
+        failureThreshold: integer | default=3
+
     spec:
-      name: string | required=true
-      replicas: integer | default=2
-      image: string | required=true
-      imagePullPolicy: string | default=Always
-      hostname: string | required=false
+      continer:
+        name: string | required=true
+        replicas: integer | default=2
+        image: string | required=true
+        imagePullPolicy: string | default=Always
+
+      ingess:
+        hostname: string | required=false
+        ingressPath: string | default=/
+        enabled:
+          externally: boolean | default=false
+          internal: boolean | default=false
+
       ports: "[]Port"
+
+      livelinessProbe: Probe | required=false
+      startupProbe: Probe | required=false
+      readinessProbe: Probe | required=false
+
       resources:
         limits:
           cpu: string | required=true
@@ -62,6 +88,13 @@ spec:
                     requests:
                       cpu: $${schema.spec.resources.requests.cpu}
                       memory: $${schema.spec.resources.requests.memory}
+                  securityContext:
+                    runAsNonRoot: true
+                    allowPrivilegeEscalation: false
+                    seccompProfile:
+                      type: RuntimeDefault
+                    capabilities:
+                      drop: ["ALL"]
 
     - id: service
       template:
@@ -87,7 +120,7 @@ spec:
 
     - id: northSoutHTTPRoute
       includeWhen:
-        - $${schema.spec.hostname.size() > 0}
+        - $${schema.spec.ingress.enabled.externally}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
@@ -105,67 +138,77 @@ spec:
             - matches:
                 - path:
                     type: PathPrefix
-                    value: /
+                    value: $${schema.spec.ingressPath}
               backendRefs:
                 - name: $${schema.spec.name}
                   port: $${schema.spec.ports[0].port}
 
     ## Linkerd mTLS polcies
-
-    # Who is allowed to call my-app
     - id: linkerdServer
-      apiVersion: policy.linkerd.io/v1beta1
-      kind: Server
-      metadata:
-        name: $${schema.spec.name}
-        namespace: $${schema.metadata.namespace}
-      spec:
-        podSelector:
-          matchLabels:
-            app: $${schema.spec.name}
-        port: $${schema.spec.ports[0].port}
-        proxyProtocol: HTTP/2
+      includeWhen:
+        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+      template:
+        apiVersion: policy.linkerd.io/v1beta1
+        kind: Server
+        metadata:
+          name: $${schema.spec.name}
+          namespace: $${schema.metadata.namespace}
+        spec:
+          podSelector:
+            matchLabels:
+              app: $${schema.spec.name}
+          port: $${schema.spec.ports[0].port}
+          proxyProtocol: HTTP/2
 
-    - id: linkerdHTTPRoute
-      apiVersion: gateway.networking.k8s.io/v1
-      kind: HTTPRoute
-      metadata:
-        name: $${schema.spec.name}-mesh-route
-        namespace: $${schema.metadata.namespace}
-      spec:
-        parentRefs:
-          - name: $${schema.spec.name}
-            kind: Service
-            group: policy.linkerd.io
-        rules:
-          - matches:
-              - path:
-                  type: PathPrefix
-                  # must include healthchecks
-                  value: /
+    - id: eastWestHTTPRoute
+      includeWhen:
+        - $${schema.spec.ingress.enabled.internally}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: $${schema.spec.name}-mesh-route
+          namespace: $${schema.metadata.namespace}
+        spec:
+          parentRefs:
+            - name: $${schema.spec.name}
+              kind: Service
+              group: policy.linkerd.io
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    # must include healthchecks
+                    value: $${schema.spec.ingressPath}
 
     - id: authenticateAllMeshedClients
-      apiVersion: policy.linkerd.io/v1alpha1
-      kind: MeshTLSAuthentication
-      metadata:
-        name: $${schema.spec.name}-all-meshed-clients
-        namespace: << inputs.name >>
-      spec:
-        identities:
-          - "*"
+      includeWhen:
+        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+      template:
+        apiVersion: policy.linkerd.io/v1alpha1
+        kind: MeshTLSAuthentication
+        metadata:
+          name: $${schema.spec.name}-all-meshed-clients
+          namespace: $${schema.metadata.namespace}
+        spec:
+          identities:
+            - "*"
 
     - id: authorizeAllMeshedClientsToAccessMyHTTPRoute
-      apiVersion: policy.linkerd.io/v1alpha1
-      kind: AuthorizationPolicy
-      metadata:
-        name: $${schema.spec.name}-allow-mesh
-        namespace: $${schema.metadata.namespace}
-      spec:
-        targetRef:
-          group: policy.linkerd.io
-          kind: HTTPRoute
-          name: $${schema.spec.name}-mesh-route
-        requiredAuthenticationRefs:
-          - name: all-meshed-clients # this is defined in the namespace object
-            kind: MeshTLSAuthentication
+      includeWhen:
+        - $${schema.spec.ingress.enabled.externally || schema.spec.ingress.enabled.internally}
+      template:
+        apiVersion: policy.linkerd.io/v1alpha1
+        kind: AuthorizationPolicy
+        metadata:
+          name: $${schema.spec.name}-allow-mesh
+          namespace: $${schema.metadata.namespace}
+        spec:
+          targetRef:
             group: policy.linkerd.io
+            kind: HTTPRoute
+            name: $${schema.spec.name}-mesh-route
+          requiredAuthenticationRefs:
+            - name: all-meshed-clients # this is defined in the namespace object
+              kind: MeshTLSAuthentication
+              group: policy.linkerd.io

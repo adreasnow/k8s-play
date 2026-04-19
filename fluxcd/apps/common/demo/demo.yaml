@@ -1,5 +1,5 @@
 apiVersion: kro.run/v1alpha1
-kind: Service
+kind: MeshedService
 metadata:
   name: demo
   namespace: demo

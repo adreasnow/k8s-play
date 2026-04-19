@@ -11,13 +11,14 @@ spec:
       Port:
         port: integer | required=true
         protocol: string | required=true
+      HttpHeaders:
+        name: string
+        value: string
       Probe:
         httpGet:
           path: string | required=true
           port: integer | required=true
-          httpHeaders:
-            - name: Accept
-              value: application/json
+          httpHeaders: '[]HttpHeaders'
 
         initialDelaySeconds: integer | default=15
         periodSeconds: integer | default=5

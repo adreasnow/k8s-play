@@ -76,8 +76,16 @@ spec:
             app: deployment
           ports: $${schema.spec.ports}
 
-    # north-south
-    - id: httpRoute
+    - id: serviceAccount # TODO: figure out proper RBAC...
+      template:
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: $${schema.spec.name}
+          namespace: $${schema.metadata.namespace}
+        automountServiceAccountToken: false
+
+    - id: northSoutHTTPRoute
       includeWhen:
         - $${schema.spec.hostname.size() > 0}
       template:
@@ -90,6 +98,7 @@ spec:
           parentRefs:
             - name: traefik-gateway # north-south
               namespace: traefik
+              sectionName: websecure
           hostnames:
             - $${schema.spec.hostname}.${domain}
           rules:
@@ -101,22 +110,11 @@ spec:
                 - name: $${schema.spec.name}
                   port: $${schema.spec.ports[0].port}
 
-
-    - id: serviceAccount # TODO: figure out proper RBAC...
-      template:
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: $${schema.spec.name}
-          namespace: $${schema.metadata.namespace}
-        automountServiceAccountToken: false
-
-
     ## Linkerd mTLS polcies
 
     # Who is allowed to call my-app
     - id: linkerdServer
-      apiVersion: policy.linkerd.io/v1beta3
+      apiVersion: policy.linkerd.io/v1beta1
       kind: Server
       metadata:
         name: $${schema.spec.name}
@@ -128,43 +126,39 @@ spec:
         port: $${schema.spec.ports[0].port}
         proxyProtocol: HTTP/2
 
-    - id: linkerdHttpRoute
-      template:
-        apiVersion: gateway.networking.k8s.io/v1
-        kind: HTTPRoute
-        metadata:
-          name: $${schema.spec.name}-mesh-route
-          namespace: $${schema.metadata.namespace}
-        spec:
-          parentRefs:
-            - name: $${schema.spec.name}
-              kind: Service
-              group: policy.linkerd.io
-          rules:
-            - matches:
-                - path:
-                    type: PathPrefix
-                    # must include healthchecks
-                    value: /
-
-
-    - id: traefikMeshAuthentication
-      apiVersion: policy.linkerd.io/v1beta3
-      kind: MeshTLSAuthentication
+    - id: linkerdHTTPRoute
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
       metadata:
-        name: traefik-mesh-identity
+        name: $${schema.spec.name}-mesh-route
         namespace: $${schema.metadata.namespace}
       spec:
-        identityRefs:
-          - kind: ServiceAccount
-            name: traefik-traefik
-            namespace: traefik
+        parentRefs:
+          - name: $${schema.spec.name}
+            kind: Service
+            group: policy.linkerd.io
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  # must include healthchecks
+                  value: /
 
-    - id: allowTraefikAndKubeletToService
-      apiVersion: policy.linkerd.io/v1beta3
+    - id: authenticateAllMeshedClients
+      apiVersion: policy.linkerd.io/v1alpha1
+      kind: MeshTLSAuthentication
+      metadata:
+        name: $${schema.spec.name}-all-meshed-clients
+        namespace: << inputs.name >>
+      spec:
+        identities:
+          - "*"
+
+    - id: authorizeAllMeshedClientsToAccessMyHTTPRoute
+      apiVersion: policy.linkerd.io/v1alpha1
       kind: AuthorizationPolicy
       metadata:
-        name: $${schema.spec.name}-allow-traefik
+        name: $${schema.spec.name}-allow-mesh
         namespace: $${schema.metadata.namespace}
       spec:
         targetRef:
@@ -172,9 +166,6 @@ spec:
           kind: HTTPRoute
           name: $${schema.spec.name}-mesh-route
         requiredAuthenticationRefs:
-          - name: traefik-mesh-identity
+          - name: all-meshed-clients # this is defined in the namespace object
             kind: MeshTLSAuthentication
-            group: policy.linkerd.io
-          - name: kubelet-network-auth
-            kind: NetworkAuthentication
             group: policy.linkerd.io

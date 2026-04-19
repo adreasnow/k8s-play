@@ -16,7 +16,7 @@ spec:
         matchLabels:
           template: ${namespaceRSIPTemplateName}
   resources:
-    - apiVersion: kro.run/v1alpha1
+    - apiVersion: bellroy.com/v1alpha1
       kind: MeshedNamespace
       metadata:
         name: << inputs.name >>

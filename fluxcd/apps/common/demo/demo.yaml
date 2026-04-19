@@ -1,4 +1,4 @@
-apiVersion: kro.run/v1alpha1
+apiVersion: bellroy.com/v1alpha1
 kind: MeshedService
 metadata:
   name: demo

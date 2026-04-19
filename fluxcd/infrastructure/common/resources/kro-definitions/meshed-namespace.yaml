@@ -11,7 +11,7 @@ spec:
       name: string | required=true
 
   resources:
-    - id: namespace
+    - id: ns
       template:
         apiVersion: v1
         kind: Namespace
@@ -32,7 +32,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-same-namespace-communication
-          namespace: ${namespace.metadata.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:
@@ -49,7 +49,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-external-egress
-          namespace: ${namespace.metadata.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:
@@ -69,7 +69,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-dns-resolution
-          namespace: ${namespace.metadata.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:
@@ -95,7 +95,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-linkerd-cert-retrieval
-          namespace: ${namespace.metadata.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:

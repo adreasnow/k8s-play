@@ -34,6 +34,8 @@ spec:
       externalCA: true
       issuer:
         scheme: kubernetes.io/tls
+    proxy:
+      defaultInboundPolicy: deny
 
     # TODO: Disable for EKS
     proxyInit:

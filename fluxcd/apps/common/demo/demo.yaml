@@ -6,11 +6,19 @@ metadata:
 spec:
   name: demo
   replicas: 2
-  image: argoproj/rollouts-demo:purple
-  hostname: demo
-  ports:
-    - port: 8080
-      protocol: TCP
+
+  container:
+    image: argoproj/rollouts-demo:purple
+    ports:
+      - port: 8080
+        protocol: TCP
+
+  ingress:
+    hostname: demo
+    enabled:
+      internal: true
+      external: true
+
   resources:
     requests:
       cpu: 100m

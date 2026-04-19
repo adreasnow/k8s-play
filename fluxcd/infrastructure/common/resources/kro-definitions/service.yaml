@@ -11,9 +11,11 @@ spec:
       Port:
         port: integer | required=true
         protocol: string | required=true
+
       HttpHeaders:
         name: string
         value: string
+
       Probe:
         httpGet:
           path: string | required=true

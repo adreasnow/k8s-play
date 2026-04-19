@@ -5,6 +5,7 @@ metadata:
 spec:
   schema:
     apiVersion: v1alpha1
+    group: bellroy.com
     kind: MeshedService
     scope: Namespaced
     types:

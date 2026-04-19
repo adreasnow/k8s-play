@@ -7,6 +7,7 @@ spec:
   parentRefs:
     - name: traefik-gateway
       namespace: traefik
+      sectionName: websecure
   hostnames:
     - linkerd.admin.${domain}
   rules:
@@ -17,3 +18,41 @@ spec:
       backendRefs:
         - name: web
           port: 8084
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: linkerd-viz-mesh-route
+spec:
+  parentRefs:
+    - name: linkerd-viz
+      kind: Server
+      group: policy.linkerd.io
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: MeshTLSAuthentication
+metadata:
+  name: linkerd-viz-all-meshed-clients
+spec:
+  identities:
+    - "*"
+---
+apiVersion: policy.linkerd.io/v1alpha1
+kind: AuthorizationPolicy
+metadata:
+  name: linkerd-viz-allow-mesh
+spec:
+  targetRef:
+    group: policy.linkerd.io
+    kind: HTTPRoute
+    name: linkerd-viz-mesh-route
+  requiredAuthenticationRefs:
+    - name: linkerd-viz-all-meshed-clients
+      kind: MeshTLSAuthentication
+      group: policy.linkerd.io

@@ -30,7 +30,7 @@ spec:
       component: web
       linkerd.io/extension: viz
   port: 8084
-  proxyProtocol: HTTP/2
+  proxyProtocol: HTTP/1
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

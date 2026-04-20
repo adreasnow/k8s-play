@@ -17,7 +17,7 @@ spec:
             value: /
       backendRefs:
         - name: web
-          port: http
+          port: 8084
 ---
 apiVersion: policy.linkerd.io/v1beta1
 kind: Server
@@ -28,7 +28,8 @@ spec:
   podSelector:
     matchLabels:
       component: web
-  port: http
+      linkerd.io/extension: viz
+  port: 8084
   proxyProtocol: HTTP/1
 ---
 apiVersion: gateway.networking.k8s.io/v1

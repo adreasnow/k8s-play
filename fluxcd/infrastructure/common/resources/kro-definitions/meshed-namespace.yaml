@@ -31,7 +31,7 @@ spec:
         kind: Gateway
         metadata:
           name: waypoint
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
           labels:
             istio.io/waypoint-for: service   # handles all Services in this namespace
         spec:
@@ -47,7 +47,7 @@ spec:
         kind: AuthorizationPolicy
         metadata:
           name: deny-all
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
         spec: {}
 
     - id: allowAllMeshedClientsViaWaypoint
@@ -56,7 +56,7 @@ spec:
         kind: AuthorizationPolicy
         metadata:
           name: allow-mesh-via-waypoint
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
         spec:
           targetRefs:
             - group: gateway.networking.k8s.io
@@ -74,7 +74,7 @@ spec:
         kind: AuthorizationPolicy
         metadata:
           name: allow-l4-from-waypoint-or-same-ns
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
         spec:
           action: ALLOW
           rules:
@@ -82,11 +82,11 @@ spec:
                 - source:
                     # Traffic from our own waypoint
                     principals:
-                      - "cluster.local/ns/${schema.spec.name}/sa/waypoint"
+                      - "cluster.local/ns/${ns.metadata.name}/sa/waypoint"
             - from:
                 - source:
                     # Intra-namespace pod-to-pod (no waypoint needed for same-ns)
-                    namespaces: ["${schema.spec.name}"]
+                    namespaces: ["${ns.metadata.name}"]
 
     - id: allowSameNamespaceCommunication
       template:
@@ -94,7 +94,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-same-namespace-communication
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:
@@ -103,7 +103,7 @@ spec:
             - from:
                 - namespaceSelector:
                     matchLabels:
-                      kubernetes.io/metadata.name: ${schema.spec.name}
+                      kubernetes.io/metadata.name: ${ns.metadata.name}
 
     - id: egressPolicyAllowExternalTraffic
       template:
@@ -156,7 +156,7 @@ spec:
         kind: NetworkPolicy
         metadata:
           name: allow-istio-cert-retrieval
-          namespace: ${schema.spec.name}
+          namespace: ${ns.metadata.name}
         spec:
           podSelector: {}
           policyTypes:

@@ -20,6 +20,7 @@ spec:
           name: ${schema.spec.name}
           labels:
             istio.io/dataplane-mode: ambient
+            istio.io/use-waypoint: waypoint
             pod-security.kubernetes.io/enforce: baseline
             pod-security.kubernetes.io/warn: restricted
             pod-security.kubernetes.io/audit: restricted
@@ -39,15 +40,6 @@ spec:
             - name: mesh
               port: 15008
               protocol: HBONE
-
-    - id: namespaceWaypointLabel
-      template:
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: ${schema.spec.name}
-          labels:
-            istio.io/use-waypoint: waypoint
 
     - id: denyAllTraffic
       template:

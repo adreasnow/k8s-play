@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - helm-repository.yaml
+  - helm-release.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: traefik-values
+    namespace: flux-system
+    files:
+      - networking=values-networking.yaml
+      - pods=values-pods.yaml
+      - services=values-services.yaml
+      - aws-lb=values-aws-lb.yaml
+      - observability=values-observability.yaml
+      - dashboard=values-dashboard.yaml

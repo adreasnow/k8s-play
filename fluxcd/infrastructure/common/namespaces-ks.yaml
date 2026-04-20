@@ -15,7 +15,7 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: linkerd
+    - name: istio
     - name: kro-definitions
   postBuild:
     substituteFrom:

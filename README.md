@@ -32,7 +32,7 @@ These are the tools used to manage the repository itself
 - Demo app - [https://demo.k8s.orb.local]
 - Traefik Dashboard - [https://traefik.admin.k8s.orb.local]
 - Flux-Operator Dashboard - [https://flux-operator.admin.k8s.orb.local]
-- Linkerd Dashboard - [https://linkerd.admin.k8s.orb.local]
+- Istio Dashboard - [https://kiali.admin.k8s.orb.local]
 
 ## Productionising Alternatives
 

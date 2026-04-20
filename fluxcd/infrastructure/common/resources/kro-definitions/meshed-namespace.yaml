@@ -18,12 +18,100 @@ spec:
         kind: Namespace
         metadata:
           name: ${schema.spec.name}
-          annotations:
-            linkerd.io/inject: enabled
           labels:
+            istio.io/dataplane-mode: ambient
             pod-security.kubernetes.io/enforce: baseline
             pod-security.kubernetes.io/warn: restricted
             pod-security.kubernetes.io/audit: restricted
+
+    - id: waypoint
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: Gateway
+        metadata:
+          name: waypoint
+          namespace: ${schema.spec.name}
+          labels:
+            istio.io/waypoint-for: service   # handles all Services in this namespace
+        spec:
+          gatewayClassName: istio-waypoint
+          listeners:
+            - name: mesh
+              port: 15008
+              protocol: HBONE
+
+    - id: namespaceWaypointLabel
+      template:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: ${schema.spec.name}
+          labels:
+            istio.io/use-waypoint: waypoint
+
+    - id: denyAllTraffic
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: deny-all
+          namespace: ${schema.spec.name}
+        spec: {}
+
+    - id: allowAllMeshedClientsViaWaypoint
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: allow-mesh-via-waypoint
+          namespace: ${schema.spec.name}
+        spec:
+          targetRefs:
+            - group: gateway.networking.k8s.io
+              kind: Gateway
+              name: waypoint
+          action: ALLOW
+          rules:
+            - from:
+                - source:
+                    principals: ["cluster.local/*"]
+
+    - id: allowOnlyWaypointAndSameNamespaceAtL4
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: allow-l4-from-waypoint-or-same-ns
+          namespace: ${schema.spec.name}
+        spec:
+          action: ALLOW
+          rules:
+            - from:
+                - source:
+                    # Traffic from our own waypoint
+                    principals:
+                      - "cluster.local/ns/${schema.spec.name}/sa/waypoint"
+            - from:
+                - source:
+                    # Intra-namespace pod-to-pod (no waypoint needed for same-ns)
+                    namespaces: ["${schema.spec.name}"]
+
+    - id: allowSameNamespaceCommunication
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-same-namespace-communication
+          namespace: ${schema.spec.name}
+        spec:
+          podSelector: {}
+          policyTypes:
+            - Ingress
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: ${schema.spec.name}
 
     - id: egressPolicyAllowExternalTraffic
       template:
@@ -57,7 +145,6 @@ spec:
           policyTypes:
             - Egress
           egress:
-            # kubeDNS resolution
             - to:
                 - namespaceSelector:
                     matchLabels:
@@ -71,13 +158,13 @@ spec:
                 - protocol: TCP
                   port: 53
 
-    - id: egressPolicyAllowLinkerdCertRetrieval
+    - id: egressPolicyAllowIstioCertRetrieval
       template:
         apiVersion: networking.k8s.io/v1
         kind: NetworkPolicy
         metadata:
-          name: allow-linkerd-cert-retrieval
-          namespace: ${ns.metadata.name}
+          name: allow-istio-cert-retrieval
+          namespace: ${schema.spec.name}
         spec:
           podSelector: {}
           policyTypes:
@@ -86,11 +173,11 @@ spec:
             - to:
                 - namespaceSelector:
                     matchLabels:
-                      linkerd.io/control-plane-ns: linkerd
+                      kubernetes.io/metadata.name: istio-system
               ports:
                 - protocol: TCP
-                  port: 8086   # destination service
+                  port: 15012  # istiod xDS / cert issuance
                 - protocol: TCP
-                  port: 8080   # identity service
+                  port: 15008  # HBONE tunnel port (ztunnel)
                 - protocol: TCP
-                  port: 8090   # policy controller
+                  port: 15010  # istiod plaintext (internal only, can omit if STRICT)

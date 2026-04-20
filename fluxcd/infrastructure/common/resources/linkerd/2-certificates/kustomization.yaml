@@ -1,8 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - 1-trust-root-issuer.yaml
-  - 2-trust-anchor.yaml
-  - 3-identity-issuer.yaml
-  - 4-identity-issuer-cert.yaml
-  - 5-trust-bundle.yaml

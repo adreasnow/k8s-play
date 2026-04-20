@@ -3,6 +3,4 @@ kind: Namespace
 metadata:
   name: traefik
   annotations:
-    linkerd.io/inject: ingress
-    config.linkerd.io/skip-inbound-ports: "30001,30000"
-    config.linkerd.io/skip-outbound-ports: "443"
+    istio.io/dataplane-mode: ambient

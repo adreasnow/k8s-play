@@ -1,19 +1,16 @@
     apiVersion: kustomize.toolkit.fluxcd.io/v1
     kind: Kustomization
     metadata:
-      name: linkerd-core
+      name: istio-base
       namespace: flux-system
     spec:
       interval: 10m
       timeout: 10m
       retryInterval: 1m
-      path: ./fluxcd/infrastructure/common/resources/linkerd/3-linkerd
+      path: ./fluxcd/infrastructure/common/resources/istio/1-istio
       prune: false
       force: false
       wait: true
       sourceRef:
         kind: GitRepository
         name: flux-system
-      dependsOn:
-        - name: linkerd-certificates
-        - name: linkerd-namespace

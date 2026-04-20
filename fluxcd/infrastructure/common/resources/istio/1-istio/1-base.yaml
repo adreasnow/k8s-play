@@ -1,25 +1,21 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: linkerd-crds
+  name: istio-base
   namespace: flux-system
 spec:
   interval: 10m
   chart:
     spec:
-      chart: linkerd-crds
-      version: 2026.4.3
+      chart: base
+      version: 1.29.1
       sourceRef:
         kind: HelmRepository
-        name: linkerd
+        name: istio
         namespace: flux-system
       interval: 1h
-  targetNamespace: linkerd
+  targetNamespace: istio-system
   install:
     createNamespace: true
-    remediation:
-      retries: 3
   upgrade:
     cleanupOnFail: true
-    remediation:
-      retries: 3

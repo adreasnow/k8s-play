@@ -4,9 +4,9 @@ resources:
   - cert-manager-ks.yaml
   - flux-operator-dashboard-ks.yaml
   - gateway-api-ks.yaml
+  - istio-ks.yaml
   - kro-definitions-ks.yaml
   - kro-ks.yaml
-  - linkerd-ks.yaml
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
   - traefik-ks.yaml

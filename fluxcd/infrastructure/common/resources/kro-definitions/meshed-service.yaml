@@ -152,22 +152,6 @@ spec:
                 - name: ${schema.spec.name}
                   port: ${schema.spec.container.ports[0].port}
 
-    ## Linkerd mTLS policies
-    - id: linkerdServer
-      includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
-      template:
-        apiVersion: policy.linkerd.io/v1beta1
-        kind: Server
-        metadata:
-          name: ${schema.spec.name}
-        spec:
-          podSelector:
-            matchLabels:
-              app: ${schema.spec.name}
-          port: ${schema.spec.container.ports[0].port}
-          proxyProtocol: HTTP/2
-
     - id: eastWestHTTPRoute
       includeWhen:
         - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
@@ -176,44 +160,64 @@ spec:
         kind: HTTPRoute
         metadata:
           name: ${schema.spec.name}-mesh-route
+          namespace: ${schema.metadata.namespace}
         spec:
           parentRefs:
             - name: ${schema.spec.name}
-              kind: Server
-              group: policy.linkerd.io
+              kind: Service
+              group: ""       # core API group — standard GAMMA pattern
+              port: ${schema.spec.ports[0].port}
           rules:
             - matches:
                 - path:
                     type: PathPrefix
-                    # must include healthchecks
-                    value: ${schema.spec.ingress.path}
+                    value: ${schema.spec.ingressPath}
+              backendRefs:
+                - name: ${schema.spec.name}
+                  port: ${schema.spec.ports[0].port}
 
-    - id: authenticateAllMeshedClients
-      includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
-      template:
-        apiVersion: policy.linkerd.io/v1alpha1
-        kind: MeshTLSAuthentication
-        metadata:
-          name: ${schema.spec.name}-all-meshed-clients
-        spec:
-          identities:
-            - "*"
+    # - id: allowAllMeshedClients
+    #   includeWhen:
+    #     - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+    #   template:
+    #     apiVersion: security.istio.io/v1
+    #     kind: AuthorizationPolicy
+    #     metadata:
+    #       name: ${schema.spec.name}-allow-mesh
+    #       namespace: ${schema.metadata.namespace}
+    #     spec:
+    #       targetRefs:
+    #         - group: ""
+    #           kind: Service
+    #           name: ${schema.spec.name}
+    #       action: ALLOW
+    #       rules:
+    #         - from:
+    #             - source:
+    #                 principals: ["cluster.local/*"]
 
-    - id: authorizeAllMeshedClientsToAccessMyHTTPRoute
-      includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
-      template:
-        apiVersion: policy.linkerd.io/v1alpha1
-        kind: AuthorizationPolicy
-        metadata:
-          name: ${schema.spec.name}-allow-mesh
-        spec:
-          targetRef:
-            group: policy.linkerd.io
-            kind: HTTPRoute
-            name: ${schema.spec.name}-mesh-route
-          requiredAuthenticationRefs:
-            - name: ${authenticateAllMeshedClients.metadata.name}
-              kind: MeshTLSAuthentication
-              group: policy.linkerd.io
+    # - id: requireWaypointAtL4
+    #   includeWhen:
+    #     - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+    #   template:
+    #     apiVersion: security.istio.io/v1
+    #     kind: AuthorizationPolicy
+    #     metadata:
+    #       name: ${schema.spec.name}-require-waypoint
+    #       namespace: ${schema.metadata.namespace}
+    #     spec:
+    #       selector:
+    #         matchLabels:
+    #           app: ${schema.spec.name}
+    #       action: ALLOW
+    #       rules:
+    #         - from:
+    #             - source:
+    #                 # Only accept from the namespace waypoint
+    #                 principals:
+    #                   - "cluster.local/ns/${schema.metadata.namespace}/sa/waypoint"
+    #         - from:
+    #             - source:
+    #                 # Allow same-namespace traffic (e.g. kubelet health probes
+    #                 # routed via ztunnel, or co-located services)
+    #                 namespaces: ["${schema.metadata.namespace}"]

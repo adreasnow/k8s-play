@@ -1,8 +1,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: linkerd
+  name: istio
   namespace: flux-system
 spec:
   interval: 1h
-  url: https://helm.linkerd.io/edge
+  url: https://istio-release.storage.googleapis.com/charts

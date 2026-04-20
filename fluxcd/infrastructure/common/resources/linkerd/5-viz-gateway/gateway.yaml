@@ -28,7 +28,6 @@ spec:
   podSelector:
     matchLabels:
       component: web
-      linkerd.io/extension: viz
   port: http
   proxyProtocol: HTTP/1
 ---

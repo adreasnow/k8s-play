@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - helm-repository.yaml
+  - 1-base.yaml
+  - 2-istiod.yaml
+  - 3-cni.yaml
+  - 4-ztunnel.yaml

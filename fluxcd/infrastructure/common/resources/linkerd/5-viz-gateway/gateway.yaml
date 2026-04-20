@@ -32,22 +32,6 @@ spec:
   port: 8084
   proxyProtocol: HTTP/1
 ---
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: linkerd-viz-mesh-route
-  namespace: linkerd-viz
-spec:
-  parentRefs:
-    - name: linkerd-viz
-      kind: Server
-      group: policy.linkerd.io
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
----
 apiVersion: policy.linkerd.io/v1alpha1
 kind: MeshTLSAuthentication
 metadata:
@@ -65,8 +49,8 @@ metadata:
 spec:
   targetRef:
     group: policy.linkerd.io
-    kind: HTTPRoute
-    name: linkerd-viz-mesh-route
+    kind: Server
+    name: linkerd-viz
   requiredAuthenticationRefs:
     - name: linkerd-viz-all-meshed-clients
       kind: MeshTLSAuthentication

@@ -16,3 +16,7 @@
         name: flux-system
       dependsOn:
         - name: kiali
+      postBuild:
+        substituteFrom:
+          - kind: ConfigMap
+            name: cluster-vars

@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - 1-istio-ks.yaml
   - 3-kiali-gateway-ks.yaml
-  - 2-kiali.yaml
+  - 2-kiali-ks.yaml

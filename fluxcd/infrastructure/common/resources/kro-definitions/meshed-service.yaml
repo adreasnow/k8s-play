@@ -171,7 +171,7 @@ spec:
             - matches:
                 - path:
                     type: PathPrefix
-                    value: ${schema.spec.ingressPath}
+                    value: ${schema.spec.ingress.path}
               backendRefs:
                 - name: ${schema.spec.name}
                   port: ${schema.spec.container.ports[0].port}

@@ -166,7 +166,7 @@ spec:
             - name: ${schema.spec.name}
               kind: Service
               group: ""       # core API group — standard GAMMA pattern
-              port: ${schema.spec.ports[0].port}
+              port: ${schema.spec.container.ports[0].port}
           rules:
             - matches:
                 - path:
@@ -174,7 +174,7 @@ spec:
                     value: ${schema.spec.ingressPath}
               backendRefs:
                 - name: ${schema.spec.name}
-                  port: ${schema.spec.ports[0].port}
+                  port: ${schema.spec.container.ports[0].port}
 
     # - id: allowAllMeshedClients
     #   includeWhen:

@@ -61,11 +61,23 @@ spec:
           namespace: ${ns.metadata.name}
         spec: {}
 
-    # NOTE: No blanket allow on the waypoint Gateway.
-    # Cross-namespace mesh access is route-gated: a service is only reachable
-    # from other namespaces if it has both an HTTPRoute (GAMMA, Service parentRef)
-    # AND a Service-scoped AuthorizationPolicy allowing cluster.local/* principals.
-    # See per-service gateway.yaml files for those definitions.
+    - id: allowAllMeshedClientsViaWaypoint
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: allow-mesh-via-waypoint
+          namespace: ${ns.metadata.name}
+        spec:
+          targetRefs:
+            - group: gateway.networking.k8s.io
+              kind: Gateway
+              name: waypoint
+          action: ALLOW
+          rules:
+            - from:
+                - source:
+                    principals: ["cluster.local/*"]
 
     - id: allowOnlyWaypointAndSameNamespaceAtL4
       template:
@@ -103,28 +115,6 @@ spec:
                 - namespaceSelector:
                     matchLabels:
                       kubernetes.io/metadata.name: ${ns.metadata.name}
-
-    - id: allowMeshIngress
-      template:
-        apiVersion: networking.k8s.io/v1
-        kind: NetworkPolicy
-        metadata:
-          name: allow-mesh-ingress
-          namespace: ${ns.metadata.name}
-        spec:
-          podSelector: {}
-          policyTypes:
-            - Ingress
-          ingress:
-            # Allow HBONE traffic from istio-system ztunnel carrying
-            # cross-namespace mesh requests to the waypoint
-            - from:
-                - namespaceSelector:
-                    matchLabels:
-                      kubernetes.io/metadata.name: istio-system
-              ports:
-                - protocol: TCP
-                  port: 15008  # HBONE tunnel port (waypoint listener)
 
     - id: egressPolicyAllowExternalTraffic
       template:

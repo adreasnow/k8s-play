@@ -64,9 +64,12 @@ metadata:
   name: mimir-require-waypoint
   namespace: mimir
 spec:
-  selector:
-    matchLabels:
-      app: mimir
+  # targetRefs is the ambient-native pattern; ztunnel enforces at L4
+  # on the Service's backing workloads instead of a label selector.
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: mimir-mimir-gateway
   action: ALLOW
   rules:
     - from:

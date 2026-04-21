@@ -184,3 +184,24 @@ spec:
                   port: 15008  # HBONE tunnel port (ztunnel)
                 - protocol: TCP
                   port: 15010  # istiod plaintext (internal only, can omit if STRICT)
+
+    - id: egressPolicyAllowKubeAPIServer
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-kube-apiserver
+          namespace: ${ns.metadata.name}
+        spec:
+          podSelector: {}
+          policyTypes:
+            - Egress
+          egress:
+            # kube-apiserver ClusterIP is RFC1918 and is excluded by
+            # allow-external-egress. Without this, any controller/operator
+            # or SDK in the namespace cannot reach the API.
+            - ports:
+                - protocol: TCP
+                  port: 443
+                - protocol: TCP
+                  port: 6443

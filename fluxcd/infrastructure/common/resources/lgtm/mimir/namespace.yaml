@@ -146,3 +146,20 @@ spec:
           port: 15008  # HBONE tunnel port (ztunnel)
         - protocol: TCP
           port: 15010  # istiod plaintext (internal only, can omit if STRICT)
+---
+# kube-apiserver (ClusterIP is RFC1918 — blocked by allow-external-egress)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kube-apiserver
+  namespace: mimir
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443

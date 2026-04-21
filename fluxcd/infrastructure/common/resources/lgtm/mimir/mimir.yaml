@@ -31,6 +31,11 @@ spec:
       name: mimir-values
       valuesKey: resources
   values:
+    auth:
+      multitenancy_enabled: true
+    mimir:
+      structuredConfig:
+        no_auth_tenant: ${name}
     # ingester:
     #   zoneAwareReplication:
     #     enabled: true

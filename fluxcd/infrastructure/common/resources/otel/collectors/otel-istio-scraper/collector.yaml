@@ -65,7 +65,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$${1}:15020"
+                  replacement: "$$${1}:15020"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -90,7 +90,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$${1}:15090"
+                  replacement: "$$${1}:15090"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -114,7 +114,7 @@ spec:
       otlphttp:
         endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
         headers:
-          X-Scope-OrgID: anonymous
+          X-Scope-OrgID: istio-${name}
 
     service:
       pipelines:

@@ -7,6 +7,7 @@ resources:
   - istio-ks.yaml
   - kro-definitions-ks.yaml
   - kro-ks.yaml
+  - lgtm-ks.yaml
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
   - traefik-ks.yaml

@@ -16,3 +16,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: otel-operator
+    - name: lgtm

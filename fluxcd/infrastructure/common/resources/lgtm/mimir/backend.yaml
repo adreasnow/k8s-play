@@ -1,0 +1,10 @@
+# mimir:
+#   structuredConfig:
+#     common:
+#       storage:
+#         backend: s3
+#         s3:
+#           endpoint: s3.us-east-2.amazonaws.com
+#           region: us-east
+#           secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+#           access_key_id: "${AWS_ACCESS_KEY_ID}"

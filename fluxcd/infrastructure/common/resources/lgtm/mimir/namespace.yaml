@@ -1,0 +1,6 @@
+apiVersion: bellroy.com/v1alpha1
+kind: MeshedNamespace
+metadata:
+  name: mimir
+spec:
+  name: mimir

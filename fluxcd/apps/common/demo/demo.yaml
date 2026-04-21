@@ -1,5 +1,5 @@
 apiVersion: bellroy.com/v1alpha1
-kind: MeshedService
+kind: MeshedDeplyoment
 metadata:
   name: demo
   namespace: demo

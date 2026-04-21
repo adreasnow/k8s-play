@@ -17,44 +17,15 @@ spec:
         name: string
         value: string
 
-      Probe:
-        httpGet:
-          path: string | required=true
-          port: integer | required=true
-          httpHeaders: '[]HttpHeaders'
-
-        initialDelaySeconds: integer | default=15
-        periodSeconds: integer | default=5
-        timeoutSeconds: integer | default=3
-        failureThreshold: integer | default=3
-
     spec:
       name: string | required=true
-      replicas: integer | default=2
-      container:
-        image: string | required=true
-        imagePullPolicy: string | default=Always
-        ports: "[]Port"
-
+      ports: "[]Port"
       ingress:
         hostname: string | required=false
         path: string | default=/
         enabled:
           internal: boolean | default=false
           external: boolean | default=false
-
-
-      livenessProbe: Probe | required=false
-      startupProbe: Probe | required=false
-      readinessProbe: Probe | required=false
-
-      resources:
-        limits:
-          cpu: string | required=true
-          memory: string | required=true
-        requests:
-          cpu: string | required=true
-          memory: string | required=true
 
   resources:
     - id: clusterVars
@@ -64,69 +35,6 @@ spec:
         metadata:
           name: cluster-vars
           namespace: flux-operator
-
-    - id: deployment
-      template:
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          name: ${schema.spec.name}
-        spec:
-          replicas: ${schema.spec.replicas}
-          selector:
-            matchLabels:
-              app: ${schema.spec.name}
-          template:
-            metadata:
-              labels:
-                app: ${schema.spec.name}
-            spec:
-              topologySpreadConstraints:
-                - maxSkew: 1
-                  topologyKey: topology.kubernetes.io/zone
-                  whenUnsatisfiable: ScheduleAnyway
-                  labelSelector:
-                    matchLabels:
-                      app: ${schema.spec.name}
-              containers:
-                - name: ${schema.spec.name}
-                  image: ${schema.spec.container.image}
-                  imagePullPolicy: ${schema.spec.container.imagePullPolicy}
-                  ports: '${schema.spec.container.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
-                  resources:
-                    limits:
-                      cpu: ${schema.spec.resources.limits.cpu}
-                      memory: ${schema.spec.resources.limits.memory}
-                    requests:
-                      cpu: ${schema.spec.resources.requests.cpu}
-                      memory: ${schema.spec.resources.requests.memory}
-                  securityContext:
-                    runAsNonRoot: true
-                    allowPrivilegeEscalation: false
-                    seccompProfile:
-                      type: RuntimeDefault
-                    capabilities:
-                      drop: ["ALL"]
-
-    - id: svc
-      template:
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: ${schema.spec.name}
-        spec:
-          trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
-          selector:
-            app: ${schema.spec.name}
-          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "targetPort": p.port, "protocol": p.protocol})}'
-
-    - id: serviceAccount # TODO: figure out proper RBAC...
-      template:
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: ${schema.spec.name}
-        automountServiceAccountToken: false
 
     - id: northSouthHTTPRoute
       includeWhen:
@@ -150,7 +58,7 @@ spec:
                     value: ${schema.spec.ingress.path}
               backendRefs:
                 - name: ${schema.spec.name}
-                  port: ${schema.spec.container.ports[0].port}
+                  port: ${schema.spec.ports[0].port}
 
     - id: eastWestHTTPRoute
       includeWhen:
@@ -166,7 +74,7 @@ spec:
             - name: ${schema.spec.name}
               kind: Service
               group: ""       # core API group — standard GAMMA pattern
-              port: ${schema.spec.container.ports[0].port}
+              port: ${schema.spec.ports[0].port}
           rules:
             - matches:
                 - path:
@@ -174,50 +82,50 @@ spec:
                     value: ${schema.spec.ingress.path}
               backendRefs:
                 - name: ${schema.spec.name}
-                  port: ${schema.spec.container.ports[0].port}
+                  port: ${schema.spec.ports[0].port}
 
-    # - id: allowAllMeshedClients
-    #   includeWhen:
-    #     - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
-    #   template:
-    #     apiVersion: security.istio.io/v1
-    #     kind: AuthorizationPolicy
-    #     metadata:
-    #       name: ${schema.spec.name}-allow-mesh
-    #       namespace: ${schema.metadata.namespace}
-    #     spec:
-    #       targetRefs:
-    #         - group: ""
-    #           kind: Service
-    #           name: ${schema.spec.name}
-    #       action: ALLOW
-    #       rules:
-    #         - from:
-    #             - source:
-    #                 principals: ["cluster.local/*"]
+    - id: allowAllMeshedClients
+      includeWhen:
+        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: ${schema.spec.name}-allow-mesh
+          namespace: ${schema.metadata.namespace}
+        spec:
+          targetRefs:
+            - group: ""
+              kind: Service
+              name: ${schema.spec.name}
+          action: ALLOW
+          rules:
+            - from:
+                - source:
+                    principals: ["cluster.local/*"]
 
-    # - id: requireWaypointAtL4
-    #   includeWhen:
-    #     - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
-    #   template:
-    #     apiVersion: security.istio.io/v1
-    #     kind: AuthorizationPolicy
-    #     metadata:
-    #       name: ${schema.spec.name}-require-waypoint
-    #       namespace: ${schema.metadata.namespace}
-    #     spec:
-    #       selector:
-    #         matchLabels:
-    #           app: ${schema.spec.name}
-    #       action: ALLOW
-    #       rules:
-    #         - from:
-    #             - source:
-    #                 # Only accept from the namespace waypoint
-    #                 principals:
-    #                   - "cluster.local/ns/${schema.metadata.namespace}/sa/waypoint"
-    #         - from:
-    #             - source:
-    #                 # Allow same-namespace traffic (e.g. kubelet health probes
-    #                 # routed via ztunnel, or co-located services)
-    #                 namespaces: ["${schema.metadata.namespace}"]
+    - id: requireWaypointAtL4
+      includeWhen:
+        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+      template:
+        apiVersion: security.istio.io/v1
+        kind: AuthorizationPolicy
+        metadata:
+          name: ${schema.spec.name}-require-waypoint
+          namespace: ${schema.metadata.namespace}
+        spec:
+          selector:
+            matchLabels:
+              app: ${schema.spec.name}
+          action: ALLOW
+          rules:
+            - from:
+                - source:
+                    # Only accept from the namespace waypoint
+                    principals:
+                      - "cluster.local/ns/${schema.metadata.namespace}/sa/waypoint"
+            - from:
+                - source:
+                    # Allow same-namespace traffic (e.g. kubelet health probes
+                    # routed via ztunnel, or co-located services)
+                    namespaces: ["${schema.metadata.namespace}"]

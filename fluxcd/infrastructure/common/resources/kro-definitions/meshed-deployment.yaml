@@ -1,0 +1,143 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: meshed-deployment-v1alpha1
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: bellroy.com
+    kind: MeshedDeployment
+    scope: Namespaced
+    types:
+      Port:
+        port: integer | required=true
+        protocol: string | required=true
+
+      HttpHeaders:
+        name: string
+        value: string
+
+      Probe:
+        httpGet:
+          path: string | required=true
+          port: integer | required=true
+          httpHeaders: '[]HttpHeaders'
+
+        initialDelaySeconds: integer | default=15
+        periodSeconds: integer | default=5
+        timeoutSeconds: integer | default=3
+        failureThreshold: integer | default=3
+
+    spec:
+      name: string | required=true
+      replicas: integer | default=2
+      container:
+        image: string | required=true
+        imagePullPolicy: string | default=Always
+        ports: "[]Port"
+
+      ingress:
+        hostname: string | required=false
+        path: string | default=/
+        enabled:
+          internal: boolean | default=false
+          external: boolean | default=false
+
+      livenessProbe: Probe | required=false
+      startupProbe: Probe | required=false
+      readinessProbe: Probe | required=false
+
+      resources:
+        limits:
+          cpu: string | required=true
+          memory: string | required=true
+        requests:
+          cpu: string | required=true
+          memory: string | required=true
+
+  resources:
+    - id: clusterVars
+      externalRef:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: cluster-vars
+          namespace: flux-operator
+
+    - id: deployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              app: ${schema.spec.name}
+          template:
+            metadata:
+              labels:
+                app: ${schema.spec.name}
+            spec:
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: topology.kubernetes.io/zone
+                  whenUnsatisfiable: ScheduleAnyway
+                  labelSelector:
+                    matchLabels:
+                      app: ${schema.spec.name}
+              containers:
+                - name: ${schema.spec.name}
+                  image: ${schema.spec.container.image}
+                  imagePullPolicy: ${schema.spec.container.imagePullPolicy}
+                  ports: '${schema.spec.container.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
+                  resources:
+                    limits:
+                      cpu: ${schema.spec.resources.limits.cpu}
+                      memory: ${schema.spec.resources.limits.memory}
+                    requests:
+                      cpu: ${schema.spec.resources.requests.cpu}
+                      memory: ${schema.spec.resources.requests.memory}
+                  securityContext:
+                    runAsNonRoot: true
+                    allowPrivilegeEscalation: false
+                    seccompProfile:
+                      type: RuntimeDefault
+                    capabilities:
+                      drop: ["ALL"]
+
+    - id: svc
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
+          selector:
+            app: ${schema.spec.name}
+          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "targetPort": p.port, "protocol": p.protocol})}'
+
+    - id: serviceAccount # TODO: figure out proper RBAC...
+      template:
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: ${schema.spec.name}
+        automountServiceAccountToken: false
+
+    - id: meshedService
+      template:
+        apiVersion: bellroy.com/v1alpha1
+        kind: Meshedservice
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          name: ${schema.spec.name}
+          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "protocol": p.protocol})}'
+          ingress:
+            hostname: ${schema.spec.name}
+            enabled:
+              internal: ${schema.spec.ingress.enabled.internal}
+              external: ${schema.spec.ingress.enabled.external}

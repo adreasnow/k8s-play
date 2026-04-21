@@ -1,0 +1,81 @@
+---
+# North/South: External access via Traefik
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mimir
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: traefik
+      sectionName: websecure
+  hostnames:
+    - mimir.telemetry.${domain}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: mimir-mimir-gateway
+          port: 80
+---
+# East/West: Mesh access via GAMMA (Service parentRef)
+# This makes mimir-mimir-gateway reachable cross-namespace through the waypoint
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mimir-mesh-route
+  namespace: mimir
+spec:
+  parentRefs:
+    - name: mimir-mimir-gateway # same ref for GAMMA pattern
+      kind: Service
+      group: ""       # core API group — standard GAMMA pattern
+      port: 80
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: mimir-mimir-gateway # same ref for GAMMA pattern
+          port: 80
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: mimir-allow-mesh
+  namespace: mimir
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: mimir-mimir-gateway
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/*"]
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: mimir-require-waypoint
+  namespace: mimir
+spec:
+  selector:
+    matchLabels:
+      app: mimir
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            # Only accept from the namespace waypoint
+            principals:
+              - "cluster.local/ns/mimir/sa/waypoint"
+    - from:
+        - source:
+            # Allow same-namespace traffic (e.g. kubelet health probes
+            # routed via ztunnel, or co-located services)
+            namespaces: ["mimir"]

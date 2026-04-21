@@ -31,10 +31,10 @@ spec:
         auth:
           strategy: anonymous
         external_services:
+          istio:
+            gateway_api_classes_label_selector: "app.kubernetes.io/name=traefik"
           prometheus:
             # Prometheus service name is "metrics" and is in the "telemetry" namespace
             url: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/prometheus
             custom_headers:
               X-Scope-OrgID: istio-${clusterName}
-          istio:
-            gateway_api_classes_label_selector: "app.kubernetes.io/name=traefik"

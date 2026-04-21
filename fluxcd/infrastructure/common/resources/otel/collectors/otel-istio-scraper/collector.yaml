@@ -65,7 +65,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$$${1}:15020"
+                  replacement: "$$$$1:15020"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -90,7 +90,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$$${1}:15090"
+                  replacement: "$$$$1:15090"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -107,10 +107,6 @@ spec:
         timeout: 5s
 
     exporters:
-      # Push metrics to Mimir via native OTLP over HTTP.
-      # Mimir's OTLP endpoint accepts OpenTelemetry metrics directly and
-      # converts them to the Prometheus data model for PromQL queries.
-      # See: https://grafana.com/docs/mimir/latest/configure/configure-otel-collector/
       otlphttp:
         endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
         headers:

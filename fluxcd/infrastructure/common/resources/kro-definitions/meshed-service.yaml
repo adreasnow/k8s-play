@@ -102,7 +102,7 @@ spec:
                 - source:
                     principals: ["cluster.local/*"]
 
-    - id: requireWaypointAtL4
+    - id: requireWaypoint
       includeWhen:
         - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
       template:
@@ -112,9 +112,13 @@ spec:
           name: ${schema.spec.service}-require-waypoint
           namespace: ${schema.metadata.namespace}
         spec:
-          selector:
-            matchLabels:
-              app: ${schema.spec.service}
+          # targetRefs is the ambient-native pattern; enforced at the
+          # waypoint (since the namespace has one) rather than at ztunnel
+          # via a label selector.
+          targetRefs:
+            - group: ""
+              kind: Service
+              name: ${schema.spec.service}
           action: ALLOW
           rules:
             - from:

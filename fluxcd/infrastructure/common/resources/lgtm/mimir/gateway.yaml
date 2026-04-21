@@ -21,7 +21,7 @@ spec:
           port: 80
 ---
 # East/West: Mesh access via GAMMA (Service parentRef)
-# This makes mimir-mimir-gateway reachable cross-namespace through the waypoint
+# This handles internal path based routing
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

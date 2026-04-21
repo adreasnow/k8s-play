@@ -61,6 +61,8 @@ spec:
               backendRefs:
                 '${schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "port": p})}'
 
+    # East/West: Mesh access via GAMMA (Service parentRef)
+    # This handles internal path based routing
     - id: eastWestHTTPRoute
       includeWhen:
         - ${schema.spec.external.http.enabled || schema.spec.internal.http.enabled}
@@ -72,10 +74,7 @@ spec:
           namespace: ${schema.metadata.namespace}
         spec:
           parentRefs:
-            - name: ${schema.spec.service}
-              kind: Service
-              group: ""       # core API group — standard GAMMA pattern
-              port: ${schema.spec.ports[0].port}
+            '${(schema.spec.internal.http.enabled ? ${schema.spec.internal.http.ports.map(p, {"name": schema.spec.service, "kind": "Service", "group": "", "port", p})) : []) +(schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "kind": "Service", "group": "", "port", p}) : [])}'
           rules:
             - matches:
                 '${(schema.spec.internal.http.enabled ? schema.spec.internal.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : []) +(schema.spec.external.http.enabled ? ${schema.spec.external.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : [])}'

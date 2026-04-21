@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - mimir.yaml
   - namespace.yaml
+  - gateway.yaml
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:

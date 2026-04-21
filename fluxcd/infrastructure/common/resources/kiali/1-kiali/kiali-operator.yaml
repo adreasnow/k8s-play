@@ -17,8 +17,12 @@ spec:
   targetNamespace: kiali-operator
   install:
     createNamespace: true
+    remediation:
+      retries: 3
   upgrade:
     cleanupOnFail: true
+    remediation:
+      retries: 3
   values:
     cr:
       namespace: istio-system

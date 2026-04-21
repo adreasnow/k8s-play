@@ -14,5 +14,3 @@
       sourceRef:
         kind: GitRepository
         name: flux-system
-      dependsOn:
-        - name: istio-base

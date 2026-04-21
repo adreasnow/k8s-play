@@ -8,7 +8,7 @@ spec:
   timeout: 10m
   retryInterval: 1m
   path: ./fluxcd/infrastructure/common/resources/lgtm
-  prune: false
+  prune: true
   force: false
   wait: true
   sourceRef:

@@ -1,20 +1,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: mimir
+  name: otel
   namespace: flux-system
 spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/lgtm/mimir
+  path: ./fluxcd/infrastructure/common/resources/otel
   prune: true
   force: false
   wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  postBuild:
-    substituteFrom:
-      - kind: ConfigMap
-        name: cluster-vars

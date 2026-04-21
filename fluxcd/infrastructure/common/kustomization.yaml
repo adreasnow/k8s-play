@@ -11,4 +11,5 @@ resources:
   - lgtm-ks.yaml
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
+  - otel-ks.yaml
   - traefik-ks.yaml

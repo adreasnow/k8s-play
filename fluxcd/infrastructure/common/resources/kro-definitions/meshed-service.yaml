@@ -4,7 +4,7 @@ metadata:
   name: meshed-service-v1alpha1
 spec:
   schema:
-    apiVersion: v1alpha1
+    apiVersion: v1alpha2
     group: bellroy.com
     kind: MeshedService
     scope: Namespaced

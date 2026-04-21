@@ -5,6 +5,7 @@ resources:
   - flux-operator-dashboard-ks.yaml
   - gateway-api-ks.yaml
   - istio-ks.yaml
+  - kiali-ks.yaml
   - kro-definitions-ks.yaml
   - kro-ks.yaml
   - lgtm-ks.yaml

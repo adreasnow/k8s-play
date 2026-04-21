@@ -35,7 +35,7 @@ spec:
       multitenancy_enabled: true
     mimir:
       structuredConfig:
-        no_auth_tenant: ${name}
+        no_auth_tenant: ${clusterName}
     # ingester:
     #   zoneAwareReplication:
     #     enabled: true

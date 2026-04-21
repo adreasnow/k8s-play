@@ -32,7 +32,9 @@ spec:
           strategy: anonymous
         external_services:
           prometheus:
-            # Dedicated Istio Prometheus scraper deployed via otel/prometheus/istio-scraper.yaml
-            url: http://istio-prometheus-scraper-server.istio-system.svc.cluster.local:80
+            # Prometheus service name is "metrics" and is in the "telemetry" namespace
+            url: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/prometheus
+            custom_headers:
+              X-Scope-OrgID: istio-${clusterName}
           istio:
             gateway_api_classes_label_selector: "app.kubernetes.io/name=traefik"

@@ -114,7 +114,7 @@ spec:
       otlphttp:
         endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
         headers:
-          X-Scope-OrgID: istio-${name}
+          X-Scope-OrgID: istio-${clusterName}
 
     service:
       pipelines:

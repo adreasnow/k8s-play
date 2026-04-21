@@ -7,7 +7,7 @@
       interval: 10m
       timeout: 10m
       retryInterval: 1m
-      path: ./fluxcd/infrastructure/common/resources/istio/2-kiali-gateway
+      path: ./fluxcd/infrastructure/common/resources/kiali/2-kiali-gateway
       prune: true
       force: false
       wait: true

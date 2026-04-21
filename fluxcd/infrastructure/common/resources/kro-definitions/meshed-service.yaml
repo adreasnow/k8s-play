@@ -9,23 +9,27 @@ spec:
     kind: MeshedService
     scope: Namespaced
     types:
-      Port:
-        port: integer | required=true
-        protocol: string | required=true
+      HTTPRoute:
+        enabled: boolean
+        ports: '[]integer | required=true'
+        paths: '[]string | default=["/"]'
 
-      HttpHeaders:
-        name: string
-        value: string
+      GRPCRoute:
+        enabled: boolean
+        ports: '[]integer | required=true'
+        paths: '[]string | default=["/"]'
 
     spec:
-      name: string | required=true
-      ports: "[]Port"
-      ingress:
-        hostname: string | required=false
-        path: string | default=/
-        enabled:
-          internal: boolean | default=false
-          external: boolean | default=false
+      service: string | required=true
+      hostname: string | required=false
+
+      internal:
+        http: HTTPRoute
+        grpc: GRPCRoute
+
+      external:
+        http: HTTPRoute
+        grpc: GRPCRoute
 
   resources:
     - id: clusterVars
@@ -36,53 +40,47 @@ spec:
           name: cluster-vars
           namespace: flux-operator
 
-    - id: northSouthHTTPRoute
+    - id: northSouthRoute
       includeWhen:
-        - ${schema.spec.ingress.enabled.external}
+        - ${schema.spec.external.http.enabled}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
         metadata:
-          name: ${schema.spec.name}
+          name: ${schema.spec.service}
         spec:
           parentRefs:
             - name: traefik-gateway # north-south
               namespace: traefik
               sectionName: websecure
           hostnames:
-            - ${schema.spec.ingress.hostname + "." + clusterVars.data.?domain.orValue("")}
+            - ${schema.spec.hostname + "." + clusterVars.data.?domain.orValue("")}
           rules:
             - matches:
-                - path:
-                    type: PathPrefix
-                    value: ${schema.spec.ingress.path}
+                '${schema.spec.external.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}})}'
               backendRefs:
-                - name: ${schema.spec.name}
-                  port: ${schema.spec.ports[0].port}
+                '${schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "port": p})}'
 
     - id: eastWestHTTPRoute
       includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+        - ${schema.spec.external.http.enabled || schema.spec.internal.http.enabled}
       template:
         apiVersion: gateway.networking.k8s.io/v1
         kind: HTTPRoute
         metadata:
-          name: ${schema.spec.name}-mesh-route
+          name: ${schema.spec.service}-mesh-route
           namespace: ${schema.metadata.namespace}
         spec:
           parentRefs:
-            - name: ${schema.spec.name}
+            - name: ${schema.spec.service}
               kind: Service
               group: ""       # core API group — standard GAMMA pattern
               port: ${schema.spec.ports[0].port}
           rules:
             - matches:
-                - path:
-                    type: PathPrefix
-                    value: ${schema.spec.ingress.path}
+                '${(schema.spec.internal.http.enabled ? schema.spec.internal.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : []) +(schema.spec.external.http.enabled ? ${schema.spec.external.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : [])}'
               backendRefs:
-                - name: ${schema.spec.name}
-                  port: ${schema.spec.ports[0].port}
+                '${(schema.spec.internal.http.enabled ? ${schema.spec.internal.http.ports.map(p, {"name": schema.spec.service, "port": p})) : []) +(schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "port": p}) : [])}'
 
     - id: allowAllMeshedClients
       includeWhen:
@@ -91,13 +89,13 @@ spec:
         apiVersion: security.istio.io/v1
         kind: AuthorizationPolicy
         metadata:
-          name: ${schema.spec.name}-allow-mesh
+          name: ${schema.spec.service}-allow-mesh
           namespace: ${schema.metadata.namespace}
         spec:
           targetRefs:
             - group: ""
               kind: Service
-              name: ${schema.spec.name}
+              name: ${schema.spec.service}
           action: ALLOW
           rules:
             - from:
@@ -111,12 +109,12 @@ spec:
         apiVersion: security.istio.io/v1
         kind: AuthorizationPolicy
         metadata:
-          name: ${schema.spec.name}-require-waypoint
+          name: ${schema.spec.service}-require-waypoint
           namespace: ${schema.metadata.namespace}
         spec:
           selector:
             matchLabels:
-              app: ${schema.spec.name}
+              app: ${schema.spec.service}
           action: ALLOW
           rules:
             - from:

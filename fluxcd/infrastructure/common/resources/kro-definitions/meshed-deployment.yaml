@@ -9,13 +9,19 @@ spec:
     kind: MeshedDeployment
     scope: Namespaced
     types:
-      Port:
+      HTTPRoute:
+        enabled: boolean
+        ports: '[]integer | required=true'
+        paths: '[]string | default=["/"]'
+
+      GRPCRoute:
+        enabled: boolean
+        ports: '[]integer | required=true'
+        paths: '[]string | default=["/"]'
+
+      ContainerPort:
         port: integer | required=true
         protocol: string | required=true
-
-      HttpHeaders:
-        name: string
-        value: string
 
       Probe:
         httpGet:
@@ -30,18 +36,22 @@ spec:
 
     spec:
       name: string | required=true
+      hostname: string | required=false
+
       replicas: integer | default=2
       container:
         image: string | required=true
         imagePullPolicy: string | default=Always
         ports: "[]Port"
 
-      ingress:
-        hostname: string | required=false
-        path: string | default=/
-        enabled:
-          internal: boolean | default=false
-          external: boolean | default=false
+      internal:
+        http: HTTPRoute
+        grpc: GRPCRoute
+
+      external:
+        http: HTTPRoute
+        grpc: GRPCRoute
+
 
       livenessProbe: Probe | required=false
       startupProbe: Probe | required=false
@@ -134,10 +144,7 @@ spec:
         metadata:
           name: ${schema.spec.name}
         spec:
-          name: ${schema.spec.name}
-          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "protocol": p.protocol})}'
-          ingress:
-            hostname: ${schema.spec.name}
-            enabled:
-              internal: ${schema.spec.ingress.enabled.internal}
-              external: ${schema.spec.ingress.enabled.external}
+          service: ${schema.spec.name}
+          hostname: ${schema.spec.hostname}
+          internal: ${schema.spec.internal}
+          external: ${schema.spec.external}

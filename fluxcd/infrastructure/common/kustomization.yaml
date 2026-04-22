@@ -8,8 +8,9 @@ resources:
   - kiali-ks.yaml
   - kro-definitions-ks.yaml
   - kro-ks.yaml
-  - lgtm-ks.yaml
+  - telemetry-ks.yaml
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
-  - otel-ks.yaml
+  # - otel-ks.yaml
+  - alloy-ks.yaml
   - traefik-ks.yaml

@@ -65,7 +65,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$$$$1:15020"
+                  replacement: "$$$$1:15020" # $$$$ -- flux post build --> $$  -- OTEL collector env var --> $
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep

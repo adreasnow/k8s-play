@@ -1,0 +1,92 @@
+# Alloy Helm values — everything except the config content.
+# The Alloy config is stored in config.alloy and injected via
+# valuesFrom.targetPath in the HelmRelease.
+alloy:
+  configMap:
+    create: true
+  clustering:
+    enabled: true
+  extraEnv:
+    - name: CLUSTER_NAME
+      value: "${clusterName}"
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+controller:
+  type: statefulset
+  replicas: 2
+  volumeClaimTemplates:
+    - metadata:
+        name: alloy-wal
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+rbac:
+  create: true
+  rules:
+    # ── discovery.kubernetes ────────────────────────────────────────
+    - apiGroups: ["", "discovery.k8s.io", "networking.k8s.io"]
+      resources: ["endpoints", "endpointslices", "ingresses", "pods", "services"]
+      verbs: ["get", "list", "watch"]
+    # ── loki.source.kubernetes (pod log tailing via K8s API) ────────
+    - apiGroups: [""]
+      resources: ["pods", "pods/log", "namespaces"]
+      verbs: ["get", "list", "watch"]
+    # ── loki.source.podlogs ─────────────────────────────────────────
+    - apiGroups: ["monitoring.grafana.com"]
+      resources: ["podlogs"]
+      verbs: ["get", "list", "watch"]
+    # ── prometheus.operator.servicemonitors / podmonitors ───────────
+    - apiGroups: ["monitoring.coreos.com"]
+      resources: ["podmonitors", "servicemonitors", "probes", "scrapeconfigs"]
+      verbs: ["get", "list", "watch"]
+    # ── otelcol.processor.k8sattributes ────────────────────────────
+    #    Full workload metadata (deployments, statefulsets, daemonsets,
+    #    jobs, cronjobs) beyond the chart default of just replicasets.
+    - apiGroups: ["apps", "extensions"]
+      resources: ["replicasets", "deployments", "statefulsets", "daemonsets"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["batch"]
+      resources: ["jobs", "cronjobs"]
+      verbs: ["get", "list", "watch"]
+    # ── remote.kubernetes.* (secrets/configmaps) ────────────────────
+    - apiGroups: [""]
+      resources: ["configmaps", "secrets"]
+      verbs: ["get", "list", "watch"]
+    # ── mimir.rules.kubernetes ──────────────────────────────────────
+    - apiGroups: ["monitoring.coreos.com"]
+      resources: ["prometheusrules"]
+      verbs: ["get", "list", "watch"]
+    # ── mimir.alerts.kubernetes ────────────────────────────────────
+    - apiGroups: ["monitoring.coreos.com"]
+      resources: ["alertmanagerconfigs"]
+      verbs: ["get", "list", "watch"]
+    # ── loki.source.kubernetes_events ──────────────────────────────
+    - apiGroups: [""]
+      resources: ["events"]
+      verbs: ["get", "list", "watch"]
+  clusterRules:
+    # ── Nodes (cluster-scoped, needed by discovery.kubernetes) ─────
+    - apiGroups: [""]
+      resources: ["nodes"]
+      verbs: ["get", "list", "watch"]
+    # ── discovery.kubelet ───────────────────────────────────────────
+    - apiGroups: [""]
+      resources: ["nodes/pods"]
+      verbs: ["get", "list", "watch"]
+    # ── Kubelet/cAdvisor metrics endpoints ─────────────────────────
+    - apiGroups: [""]
+      resources: ["nodes/metrics"]
+      verbs: ["get", "list", "watch"]
+    - nonResourceURLs: ["/metrics"]
+      verbs: ["get"]
+serviceMonitor:
+  enabled: true

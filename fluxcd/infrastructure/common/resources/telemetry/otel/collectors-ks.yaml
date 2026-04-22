@@ -7,7 +7,7 @@ spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/otel/collectors
+  path: ./fluxcd/infrastructure/common/resources/telemetry/otel/collectors
   prune: true
   force: false
   wait: true
@@ -16,8 +16,6 @@ spec:
     name: flux-system
   dependsOn:
     - name: otel-operator
-    - name: telemetry-namespace
-    - name: mimir
   postBuild:
     substituteFrom:
       - kind: ConfigMap

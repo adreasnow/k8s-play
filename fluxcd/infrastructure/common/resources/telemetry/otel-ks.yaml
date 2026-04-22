@@ -16,3 +16,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: telemetry-namespace
+    - name: mimir

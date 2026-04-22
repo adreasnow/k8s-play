@@ -7,10 +7,12 @@ spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/otel
+  path: ./fluxcd/infrastructure/common/resources/telemetry/otel
   prune: true
   force: false
   wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
+  dependsOn:
+    - name: telemetry-namespace

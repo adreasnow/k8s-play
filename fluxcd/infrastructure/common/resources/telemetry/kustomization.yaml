@@ -5,3 +5,4 @@ resources:
   - mimir-ks.yaml
   - 0-namespace-ks.yaml
   - alloy-ks.yaml
+  - otel-ks.yaml

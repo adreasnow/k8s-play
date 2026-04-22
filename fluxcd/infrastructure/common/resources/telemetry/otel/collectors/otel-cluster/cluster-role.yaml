@@ -1,0 +1,46 @@
+# ClusterRole for the cluster-level OTel Collector.
+#
+# Permissions required by:
+#   - k8s_cluster receiver: watch cluster resources (nodes, pods, deployments, etc.)
+#   - prometheus receiver: kubernetes_sd discovery for Istio scraping
+#   - k8sattributes processor: discover pods and workload metadata
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-collector-cluster
+rules:
+  # ── k8s_cluster receiver ──────────────────────────────────────────────
+  # Watches cluster-wide resources to emit cluster-level metrics
+  # (node conditions, pod phases, deployment replicas, etc.)
+  - apiGroups: [""]
+    resources: ["nodes", "namespaces", "pods", "services", "endpoints", "resourcequotas"]
+    verbs: ["get", "list", "watch"]
+  # Node conditions and allocatable resources.
+  - apiGroups: [""]
+    resources: ["nodes/stats", "nodes/metrics"]
+    verbs: ["get", "list", "watch"]
+  # Workload resources for replica count metrics.
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+
+  # ── prometheus receiver (kubernetes_sd) ───────────────────────────────
+  # Discovers Istio control plane and ambient mesh scrape targets.
+  - apiGroups: ["", "discovery.k8s.io"]
+    resources: ["endpoints", "endpointslices", "pods", "services"]
+    verbs: ["get", "list", "watch"]
+
+  # ── k8sattributes processor ───────────────────────────────────────────
+  # Enriches scraped metrics with pod and workload metadata.
+  - apiGroups: [""]
+    resources: ["pods", "namespaces", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps", "extensions"]
+    resources: ["replicasets", "deployments", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]

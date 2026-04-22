@@ -1,13 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: otel-collectors
+  name: otel-cluster
   namespace: flux-system
 spec:
   interval: 10m
   timeout: 10m
   retryInterval: 1m
-  path: ./fluxcd/infrastructure/common/resources/otel/collectors
+  path: ./fluxcd/infrastructure/common/resources/telemetry/otel/collectors/otel-cluster
   prune: true
   force: false
   wait: true
@@ -16,4 +16,8 @@ spec:
     name: flux-system
   dependsOn:
     - name: otel-operator
-    - name: lgtm
+    - name: telemetry-namespace
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-vars

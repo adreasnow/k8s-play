@@ -1,0 +1,184 @@
+# OpenTelemetry Collector — Deployment (cluster-level)
+#
+# Single-replica deployment for cluster-wide metric collection:
+#   - k8s_cluster receiver: cluster-level metrics from the K8s API server
+#     (node conditions, pod phases, deployment replicas, namespace quotas, etc.)
+#   - prometheus receiver: Istio ambient mesh metrics (istiod, ztunnel, waypoints)
+#
+# Must be a Deployment (not DaemonSet) because:
+#   - k8s_cluster receiver watches the entire cluster; multiple replicas
+#     would produce duplicate metrics
+#   - prometheus scraping with kubernetes_sd is cluster-scoped
+#
+# This collector replaces the previous otel-istio-scraper by adding
+# k8s_cluster metrics on top of the same Istio scraping config.
+#
+# References:
+#   - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/k8sclusterreceiver
+#   - https://istio.io/latest/docs/ops/integrations/prometheus/
+#   - https://kiali.io/docs/faq/general/#requiredmetrics
+#   - https://ambientmesh.io/docs/observability/metrics/
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-cluster
+  namespace: telemetry
+spec:
+  mode: deployment
+  replicas: 1
+  serviceAccount: otel-collector-cluster
+
+  config:
+    receivers:
+      # ── Kubernetes Cluster Receiver ──────────────────────────────────
+      # Collects cluster-level metrics from the K8s API server:
+      #   - Node conditions (Ready, MemoryPressure, DiskPressure, etc.)
+      #   - Pod phases (Running, Pending, Succeeded, Failed, Unknown)
+      #   - Deployment/ReplicaSet/StatefulSet/DaemonSet replica counts
+      #   - Namespace resource quotas and limits
+      #   - Node allocatable resources (CPU, memory, pods)
+      #
+      # Only one replica should run this receiver to avoid duplicate metrics.
+      k8s_cluster:
+        auth_type: serviceAccount
+        collection_interval: 30s
+        node_conditions_to_report:
+          - Ready
+          - MemoryPressure
+          - DiskPressure
+          - PIDPressure
+          - NetworkUnavailable
+        allocatable_types_to_report:
+          - cpu
+          - memory
+          - pods
+
+      # ── Prometheus Receiver (Istio ambient mesh) ─────────────────────
+      # Scrapes Istio control plane and ambient mesh metrics.
+      # Replaces the previous otel-istio-scraper collector.
+      #
+      # Metrics scraped:
+      #   - istiod:    control plane (pilot_*, istio_build)
+      #   - ztunnel:   L4 ambient proxy (istio_tcp_*, connection_*)
+      #   - waypoint:  L7 Envoy proxies (istio_requests_*, envoy_*)
+      #
+      # Metric relabel rules match the Kiali-required metrics from:
+      # https://kiali.io/docs/faq/general/#requiredmetrics
+      prometheus:
+        config:
+          scrape_configs:
+            # ── Istiod control plane ──────────────────────────────────
+            - job_name: istiod
+              scrape_interval: 15s
+              kubernetes_sd_configs:
+                - role: endpoints
+                  namespaces:
+                    names:
+                      - istio-system
+              relabel_configs:
+                - source_labels:
+                    [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+                  action: keep
+                  regex: istiod;http-monitoring
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_build|pilot_info|pilot_proxy_convergence_time_sum|pilot_proxy_convergence_time_count|pilot_services|pilot_xds|pilot_xds_pushes|workload_manager_active_proxy_count|container_cpu_usage_seconds_total|container_memory_working_set_bytes|process_cpu_seconds_total|process_resident_memory_bytes
+
+            # ── ztunnel (ambient L4 proxy) ────────────────────────────
+            - job_name: ztunnel
+              scrape_interval: 15s
+              metrics_path: /metrics
+              kubernetes_sd_configs:
+                - role: pod
+                  namespaces:
+                    names:
+                      - istio-system
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_app]
+                  action: keep
+                  regex: ztunnel
+                - source_labels: [__meta_kubernetes_pod_ip]
+                  action: replace
+                  target_label: __address__
+                  regex: (.+)
+                  replacement: "$$$$1:15020"
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|istio_requests_total|istio_build|connection_opened|connection_closed
+
+            # ── Waypoint proxies (ambient L7) ─────────────────────────
+            - job_name: waypoint-stats
+              scrape_interval: 15s
+              metrics_path: /stats/prometheus
+              kubernetes_sd_configs:
+                - role: pod
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_istio_io_gateway_name]
+                  action: keep
+                  regex: (.+)
+                - source_labels: [__meta_kubernetes_pod_ip]
+                  action: replace
+                  target_label: __address__
+                  regex: (.+)
+                  replacement: "$$$$1:15090"
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_requests_total|istio_request_duration_milliseconds_bucket|istio_request_duration_milliseconds_count|istio_request_duration_milliseconds_sum|istio_request_bytes_bucket|istio_request_bytes_count|istio_request_bytes_sum|istio_response_bytes_bucket|istio_response_bytes_count|istio_response_bytes_sum|istio_request_messages_total|istio_response_messages_total|istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|envoy_cluster_upstream_cx_active|envoy_cluster_upstream_rq_total|envoy_listener_downstream_cx_active|envoy_listener_http_downstream_rq|envoy_server_memory_allocated|envoy_server_memory_heap_size|envoy_server_uptime
+
+    processors:
+      # ── Kubernetes Attributes Processor ──────────────────────────────
+      # Enriches prometheus-scraper metrics with pod metadata.
+      # For the k8s_cluster receiver, metadata is already set by the receiver.
+      #
+      # NOTE: When running behind Istio ambient mesh (ztunnel), the
+      # k8sattributes processor may see the ztunnel pod IP instead of
+      # the application pod IP. If this happens, set passthrough: true
+      # or use pod_association with known resource attributes.
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: connection
+
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+
+      batch:
+        send_batch_size: 2048
+        timeout: 5s
+
+    exporters:
+      # ── Mimir (metrics) ──────────────────────────────────────────────
+      # Sends all metrics via OTLP to Mimir's OTLP endpoint.
+      # X-Scope-OrgID header is required for Mimir multi-tenancy.
+      otlphttp/mimir:
+        endpoint: http://telemetry-mimir-gateway.mimir.svc.cluster.local:80/otlp
+        headers:
+          X-Scope-OrgID: ${clusterName}
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [k8s_cluster, prometheus]
+          processors: [k8sattributes, memory_limiter, batch]
+          exporters: [otlphttp/mimir]

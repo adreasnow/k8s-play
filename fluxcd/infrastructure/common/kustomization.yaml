@@ -12,5 +12,5 @@ resources:
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
   # - otel-ks.yaml
-  - alloy-ks.yaml
+  - telemetry-ks.yaml
   - traefik-ks.yaml

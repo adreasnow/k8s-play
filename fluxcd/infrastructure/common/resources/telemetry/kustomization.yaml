@@ -3,5 +3,5 @@ kind: Kustomization
 resources:
   - grafana-helm.yaml
   - mimir-ks.yaml
-  - 0-namespace.yaml
+  - 0-namespace-ks.yaml
   - alloy-ks.yaml

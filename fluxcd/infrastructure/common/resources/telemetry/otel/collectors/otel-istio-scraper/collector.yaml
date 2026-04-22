@@ -108,7 +108,7 @@ spec:
 
     exporters:
       otlphttp:
-        endpoint: http://telemetry-mimir-gateway.mimir.svc.cluster.local:80/otlp
+        endpoint: http://telemetry-mimir-gateway.telemetry.svc.cluster.local:80/otlp
         headers:
           X-Scope-OrgID: istio-${clusterName}
 

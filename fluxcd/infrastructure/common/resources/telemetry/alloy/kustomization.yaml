@@ -12,4 +12,4 @@ configMapGenerator:
   - name: alloy-config
     namespace: flux-system
     files:
-      - config=config.alloy
+      - config=config.hcl

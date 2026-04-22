@@ -8,7 +8,6 @@ resources:
   - kiali-ks.yaml
   - kro-definitions-ks.yaml
   - kro-ks.yaml
-  - telemetry-ks.yaml
   - namespaces-ks.yaml
   - networking-extras-ks.yaml
   # - otel-ks.yaml

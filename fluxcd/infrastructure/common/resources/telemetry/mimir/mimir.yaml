@@ -14,7 +14,7 @@ spec:
         name: grafana
         namespace: flux-system
       interval: 1h
-  targetNamespace: telemtry
+  targetNamespace: telemetry
   install:
     createNamespace: false
     remediation:

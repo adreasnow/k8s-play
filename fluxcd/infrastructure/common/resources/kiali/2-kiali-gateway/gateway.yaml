@@ -1,20 +1,15 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+apiVersion: bellroy.com/v1alpha1
+kind: MeshedService
 metadata:
-  name: kiali
-  namespace: istio-system
+  name: loki
 spec:
-  parentRefs:
-    - name: traefik-gateway
-      namespace: traefik
-      sectionName: websecure
-  hostnames:
-    - kiali.admin.${domain}
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: kiali
-          port: 20001
+  service: kiali
+  hostname: kiali.admin
+  internal:
+    http:
+      enabled: true
+      ports: [20001]
+  external:
+    http:
+      enabled: true
+      ports: [20001]

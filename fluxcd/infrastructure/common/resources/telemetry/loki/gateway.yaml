@@ -1,85 +1,15 @@
----
-# North/South: External access via Traefik
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+apiVersion: bellroy.com/v1alpha1
+kind: MeshedService
 metadata:
-  name: loki-external-route
-  namespace: telemetry
+  name: loki
 spec:
-  parentRefs:
-    - name: traefik-gateway
-      namespace: traefik
-      sectionName: websecure
-  hostnames:
-    - loki.telemetry.${domain}
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: telemetry-loki-gateway
-          port: 80
----
-# East/West: Mesh access via GAMMA (Service parentRef)
-# This handles internal path based routing
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: loki-mesh-route
-  namespace: telemetry
-spec:
-  parentRefs:
-    - name: telemetry-loki-gateway # same ref for GAMMA pattern
-      kind: Service
-      group: ""       # core API group — standard GAMMA pattern
-      port: 80
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: telemetry-loki-gateway # same ref for GAMMA pattern
-          port: 80
----
-apiVersion: security.istio.io/v1
-kind: AuthorizationPolicy
-metadata:
-  name: loki-allow-mesh
-  namespace: telemetry
-spec:
-  targetRefs:
-    - group: ""
-      kind: Service
-      name: telemetry-loki-gateway
-  action: ALLOW
-  rules:
-    - from:
-        - source:
-            principals: ["cluster.local/*"]
----
-apiVersion: security.istio.io/v1
-kind: AuthorizationPolicy
-metadata:
-  name: loki-require-waypoint
-  namespace: telemetry
-spec:
-  # targetRefs is the ambient-native pattern; ztunnel enforces at L4
-  # on the Service's backing workloads instead of a label selector.
-  targetRefs:
-    - group: ""
-      kind: Service
-      name: telemetry-loki-gateway
-  action: ALLOW
-  rules:
-    - from:
-        - source:
-            # Only accept from the namespace waypoint
-            principals:
-              - "cluster.local/ns/telemetry/sa/waypoint"
-    - from:
-        - source:
-            # Allow same-namespace traffic (e.g. kubelet health probes
-            # routed via ztunnel, or co-located services)
-            namespaces: ["telemetry"]
+  service: telemetry-loki-gateway
+  hostname: loki.telemetry
+  internal:
+    http:
+      enabled: true
+      ports: [80]
+  external:
+    http:
+      enabled: true
+      ports: [80]

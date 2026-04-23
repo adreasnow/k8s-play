@@ -101,7 +101,10 @@ spec:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.container.image}
                   imagePullPolicy: ${schema.spec.container.imagePullPolicy}
-                  ports: '${schema.spec.container.ports.map(p, {"containerPort": p.port, "protocol": p.protocol})}'
+                  ports: '${schema.spec.container.ports.map(p, {
+                    "containerPort": p.port,
+                    "protocol": p.protocol
+                    })}'
                   resources:
                     limits:
                       cpu: ${schema.spec.resources.limits.cpu}
@@ -127,7 +130,11 @@ spec:
           trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
           selector:
             app: ${schema.spec.name}
-          ports: '${schema.spec.container.ports.map(p, {"port": p.port, "targetPort": p.port, "protocol": p.protocol})}'
+          ports: '${schema.spec.container.ports.map(p, {
+            "port": p.port,
+            "targetPort": p.port,
+            "protocol": p.protocol
+            })}'
 
     - id: serviceAccount # TODO: figure out proper RBAC...
       template:

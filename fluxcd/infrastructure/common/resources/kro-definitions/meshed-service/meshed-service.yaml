@@ -56,10 +56,16 @@ spec:
           hostnames:
             - ${schema.spec.hostname + "." + clusterVars.data.?domain.orValue("")}
           rules:
-            - matches:
-                '${schema.spec.external.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}})}'
-              backendRefs:
-                '${schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "port": p})}'
+            - matches: '${schema.spec.external.http.paths.map(p, {
+                "path": {
+                  "type": "PathPrefix",
+                  "value": p
+                  }
+                })}'
+              backendRefs: '${schema.spec.external.http.ports.map(p, {
+                "name": schema.spec.service,
+                "port": p
+                })}'
 
     # East/West: Mesh access via GAMMA (Service parentRef)
     # This handles internal path based routing
@@ -73,13 +79,23 @@ spec:
           name: ${schema.spec.service}-mesh-route
           namespace: ${schema.metadata.namespace}
         spec:
-          parentRefs:
-            '${(schema.spec.internal.http.enabled ? ${schema.spec.internal.http.ports.map(p, {"name": schema.spec.service, "kind": "Service", "group": "", "port", p})) : []) +(schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "kind": "Service", "group": "", "port", p}) : [])}'
+          parentRefs: '${schema.spec.internal.http.ports.map(p, {
+            "name": schema.spec.service,
+            "kind": "Service",
+            "group": "",
+            "port", p
+            })}'
           rules:
-            - matches:
-                '${(schema.spec.internal.http.enabled ? schema.spec.internal.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : []) +(schema.spec.external.http.enabled ? ${schema.spec.external.http.paths.map(p, {"path": {"type": "PathPrefix", "value": p}}) : [])}'
-              backendRefs:
-                '${(schema.spec.internal.http.enabled ? ${schema.spec.internal.http.ports.map(p, {"name": schema.spec.service, "port": p})) : []) +(schema.spec.external.http.ports.map(p, {"name": schema.spec.service, "port": p}) : [])}'
+            - matches: '${schema.spec.internal.http.paths.map(p, {
+                "path": {
+                  "type": "PathPrefix",
+                  "value": p
+                  }
+                })}'
+              backendRefs: '${schema.spec.internal.http.ports.map(p, {
+                "name": schema.spec.service,
+                "port": p
+                })}'
 
     - id: allowAllMeshedClients
       includeWhen:

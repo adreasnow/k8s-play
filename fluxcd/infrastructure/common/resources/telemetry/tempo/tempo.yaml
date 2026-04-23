@@ -24,6 +24,7 @@ spec:
     remediation:
       retries: 3
   values:
+    fullname: telemetry-tempo
     multitenancyEnabled: true
     replicas: ${azCount}
     tempo.tag: 2.10.4

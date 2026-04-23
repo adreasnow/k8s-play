@@ -24,15 +24,15 @@ spec:
     remediation:
       retries: 3
   values:
-    fullname: telemetry-tempo
+    fullname: telemetry-loki
     multitenancyEnabled: true
     replicas: ${azCount}
-    tempo.tag: 3.7.1
+    loki.tag: 3.7.1
     # storage:
     #   trace:
     #     backend: s3
     #     s3:
-    #       bucket: bellroy-tempo-owlwayson
+    #       bucket: bellroy-loki-owlwayson
     #       endpoint: s3.us-east-1.amazonaws.com
   postRenderers:
     - kustomize:
@@ -40,7 +40,7 @@ spec:
           - target:
               version: v1
               kind: StatefulSet
-              name: tempo
+              name: loki
             patch: |
               - op: add
                 path: /spec/template/spec/topologySpreadConstraints
@@ -50,4 +50,4 @@ spec:
                     whenUnsatisfiable: DoNotSchedule
                     labelSelector:
                       matchLabels:
-                        app.kubernetes.io/name: tempo
+                        app.kubernetes.io/name: loki

@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - grafana-helm.yaml
   - grafana-community-helm.yaml
-  - 0-namespace-ks.yaml
+  - 0-namespaces-ks.yaml
   - loki-ks.yaml
   - mimir-ks.yaml
   - otel-ks.yaml

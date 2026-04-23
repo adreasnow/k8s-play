@@ -33,6 +33,10 @@ spec:
         timeoutSeconds: integer | default=3
         failureThreshold: integer | default=3
 
+      Port:
+        port: integer | required=true
+        protocol: string | required=true enum=TCP,UDP
+
     spec:
       name: string | required=true
       hostname: string | required=false

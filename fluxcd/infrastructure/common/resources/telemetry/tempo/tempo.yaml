@@ -7,7 +7,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      chart: tempo
+      chart: tempo-distributed
       version: 2.0.0
       sourceRef:
         kind: HelmRepository
@@ -23,10 +23,13 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: tempo-values
+      valuesKey: values
   values:
-    fullname: telemetry-tempo
+    fullnameOverride: telemetry-tempo
     multitenancyEnabled: true
-    replicas: ${azCount}
     tempo.tag: 2.10.4
     # storage:
     #   trace:
@@ -34,21 +37,3 @@ spec:
     #     s3:
     #       bucket: bellroy-tempo-owlwayson
     #       endpoint: s3.us-east-1.amazonaws.com
-
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              version: v1
-              kind: StatefulSet
-              name: tempo
-            patch: |
-              - op: add
-                path: /spec/template/spec/topologySpreadConstraints
-                value:
-                  - maxSkew: 1
-                    topologyKey: topology.kubernetes.io/zone
-                    whenUnsatisfiable: DoNotSchedule
-                    labelSelector:
-                      matchLabels:
-                        app.kubernetes.io/name: tempo

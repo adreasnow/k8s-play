@@ -50,4 +50,4 @@ spec:
                     whenUnsatisfiable: DoNotSchedule
                     labelSelector:
                       matchLabels:
-                        app.kubernetes.io/name: loki
+                        app.kubernetes.io/name: telemetry-loki

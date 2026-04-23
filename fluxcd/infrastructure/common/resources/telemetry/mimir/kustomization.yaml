@@ -9,5 +9,4 @@ configMapGenerator:
   - name: mimir-values
     namespace: flux-system
     files:
-      - resources=resources.yaml
-      - backend=backend.yaml
+      - values=values.yaml

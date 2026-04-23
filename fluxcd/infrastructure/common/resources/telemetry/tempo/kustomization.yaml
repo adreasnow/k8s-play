@@ -3,3 +3,10 @@ kind: Kustomization
 resources:
   - tempo.yaml
   - gateway.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: tempo-values
+    namespace: flux-system
+    files:
+      - values=values.yaml

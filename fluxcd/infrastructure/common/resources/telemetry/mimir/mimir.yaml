@@ -26,42 +26,22 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: mimir-values
-      valuesKey: backend
-    - kind: ConfigMap
-      name: mimir-values
-      valuesKey: resources
+      valuesKey: values
   values:
+    fullnameOverride: telemetry-mimir
     auth:
       multitenancy_enabled: true
     mimir:
       structuredConfig:
         no_auth_tenant: ${clusterName}
-    # ingester:
-    #   zoneAwareReplication:
-    #     enabled: true
-    #     topologyKey: kubernetes.io/hostname
-    #     zones:
-    #       - name: zone-a
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-a
-    #       - name: zone-b
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-b
-    #       - name: zone-c
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-c
 
-    # store_gateway:
-    #   zoneAwareReplication:
-    #     enabled: true
-    #     topologyKey: kubernetes.io/hostname
-    #     zones:
-    #       - name: zone-a
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-a
-    #       - name: zone-b
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-b
-    #       - name: zone-c
-    #         nodeSelector:
-    #           topology.kubernetes.io/zone: us-central1-c
+  # mimir:
+  #   structuredConfig:
+  #     common:
+  #       storage:
+  #         backend: s3
+  #         s3:
+  #           endpoint: s3.us-east-2.amazonaws.com
+  #           region: us-east
+  #           secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+  #           access_key_id: "${AWS_ACCESS_KEY_ID}"

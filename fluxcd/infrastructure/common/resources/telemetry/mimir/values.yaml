@@ -1,0 +1,110 @@
+# These values configure the Grafana Mimir or Grafana Enterprise Metrics cluster
+# for higher scale than the default values, but not for high-availability production use.
+# The setup targets 70% CPU and memory utilization
+# so that the cluster has room to grow. The resource requests reflect 70% utilization
+# and the limits reflect 100% utilization. The values do not set CPU limits,
+# because CPU limits have caused severe issues elsewhere, so we don't apply any in our helm chart:
+# see https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
+# If you require CPU limits for billing purposes see capped-small.yaml
+#
+# These values are suitable for ingestion of ~1M series and scrape interval of 15s.
+# This implies ingestion rate of around 66000 samples per second.
+#
+# Query requirements can vary dramatically depending on query rate and query
+# ranges. The values here satisfy a "usual" query load of around 5 queries per second
+# as seen from our production clusters at this scale.
+#
+# The values in this file also add podAntiAffinity rules for ingesters and store-gateways.
+# The rules ensure that the replicas of the same component are not scheduled on the same
+# Kubernetes Node. Zone-aware replication is enabled by default on new installation.
+# Refer to [Migrate from single zone to zone-aware replication with Helm](https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm) and
+# [Zone-Aware Replication](https://grafana.com/docs/mimir/latest/configure/configure-zone-aware-replication/)
+# for more information.
+#
+# MinIO is no longer enabled, and you are encouraged to use your cloud providers
+# object storage service such as S3 or GCS.
+
+minio.enabled: false
+kafka.enabled: false
+alertmanager.enabled: false
+overrides_exporter.enabled: false
+ruler.enabled: false
+
+compactor:
+  service:
+    trafficDistribution: PreferClose
+
+distributor:
+  replicas: ${azCount}
+  service:
+    trafficDistribution: PreferClose
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: telemetry-mimir
+
+ingester:
+  replicas: ${azCount}
+  service:
+    trafficDistribution: PreferClose
+  persistentVolume:
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: telemetry-mimir
+
+# defaults are reasonable
+querier: {}
+query_frontend: {}
+query_scheduler: {}
+
+# disabled by default
+chunks-cache: {}
+index-cache: {}
+metadata-cache: {}
+results-cache: {}
+
+store_gateway:
+  replicas: ${azCount}
+  service:
+    trafficDistribution: PreferClose
+  persistentVolume:
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: telemetry-mimir
+
+gateway:
+  replicas: ${azCount}
+  service:
+    trafficDistribution: PreferClose
+  resources:
+    requests:
+      cpu: 500m
+      memory: 256Mi
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: telemetry-mimir

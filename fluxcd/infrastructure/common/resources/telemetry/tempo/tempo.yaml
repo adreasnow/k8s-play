@@ -7,7 +7,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      chart: tempo-distributed
+      chart: tempo
       version: 2.0.0
       sourceRef:
         kind: HelmRepository
@@ -24,3 +24,12 @@ spec:
     remediation:
       retries: 3
   values:
+    multitenancyEnabled: true
+    replicas: ${azCount}
+    tempo.tag: 2.10.4
+    # storage:
+    #   trace:
+    #     backend: s3
+    #     s3:
+    #       bucket: bellroy-tempo-owlwayson
+    #       endpoint: s3.us-east-1.amazonaws.com

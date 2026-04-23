@@ -27,7 +27,6 @@ spec:
         httpGet:
           path: string | required=true
           port: integer | required=true
-          httpHeaders: '[]HttpHeaders'
 
         initialDelaySeconds: integer | default=15
         periodSeconds: integer | default=5

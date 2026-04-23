@@ -10,12 +10,12 @@ spec:
     scope: Namespaced
     types:
       HTTPRoute:
-        enabled: boolean
+        enabled: boolean | default=false
         ports: '[]integer | required=true'
         paths: '[]string | default=["/"]'
 
       GRPCRoute:
-        enabled: boolean
+        enabled: boolean | default=false
         ports: '[]integer | required=true'
         paths: '[]string | default=["/"]'
 
@@ -83,7 +83,7 @@ spec:
             "name": schema.spec.service,
             "kind": "Service",
             "group": "",
-            "port", p
+            "port": p
             })}'
           rules:
             - matches: '${schema.spec.internal.http.paths.map(p, {
@@ -99,7 +99,7 @@ spec:
 
     - id: allowAllMeshedClients
       includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+        - ${schema.spec.internal.http.enabled || schema.spec.external.http.enabled}
       template:
         apiVersion: security.istio.io/v1
         kind: AuthorizationPolicy
@@ -119,7 +119,7 @@ spec:
 
     - id: requireWaypoint
       includeWhen:
-        - ${schema.spec.ingress.enabled.external || schema.spec.ingress.enabled.internal}
+        - ${schema.spec.internal.http.enabled || schema.spec.external.http.enabled}
       template:
         apiVersion: security.istio.io/v1
         kind: AuthorizationPolicy

@@ -2,3 +2,5 @@ apiVersion: bellroy.com/v1alpha1
 kind: MeshedNamespace
 metadata:
   name: telemetry
+spec:
+  name: telemetry

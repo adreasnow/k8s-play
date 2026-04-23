@@ -15,8 +15,7 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: istio
-    - name: kro-definitions
+    - name: kro-meshed-namespace
   postBuild:
     substituteFrom:
       - kind: ConfigMap

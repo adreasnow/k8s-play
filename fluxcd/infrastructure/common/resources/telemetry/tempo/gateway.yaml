@@ -9,8 +9,8 @@ spec:
   internal:
     http:
       enabled: true
-      ports: [80]
+      ports: [3200, 4317]
   external:
     http:
       enabled: true
-      ports: [80]
+      ports: [3200]

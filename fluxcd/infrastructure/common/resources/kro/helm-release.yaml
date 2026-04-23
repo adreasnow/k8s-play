@@ -26,9 +26,9 @@ spec:
   values:
     config:
       # More workers = less queue backlog = less chance of stale state
-      dynamicControllerConcurrentReconciles: 5
+      dynamicControllerConcurrentReconciles: 10
       # Reduce resync from 10h to 30m — catches stuck instances much faster
-      dynamicControllerDefaultResyncPeriod: 1800
+      dynamicControllerDefaultResyncPeriod: 300 # 60 * 5 seconds
       # More retries before dropping (default 20 is low for flaky reconciles)
       dynamicControllerDefaultQueueMaxRetries: 50
       # Increase API server throughput to avoid throttling-induced failures

@@ -11,6 +11,8 @@ spec:
   prune: true
   force: false
   wait: true
+  dependsOn:
+    - name: kro-meshed-namespace
   sourceRef:
     kind: GitRepository
     name: flux-system

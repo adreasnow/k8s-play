@@ -38,7 +38,7 @@ spec:
         kind: ConfigMap
         metadata:
           name: cluster-vars
-          namespace: flux-operator
+          namespace: flux-system
 
     - id: northSouthRoute
       includeWhen:
@@ -77,12 +77,11 @@ spec:
           name: ${schema.spec.service}-mesh-route
           namespace: ${schema.metadata.namespace}
         spec:
-          parentRefs: '${schema.spec.internal.http.ports.map(p, {
-            "name": schema.spec.service,
-            "kind": "Service",
-            "group": "",
-            "port": p
-            })}'
+          parentRefs:
+            - name: ${schema.spec.service}
+              kind: Service
+              group: ""
+              port: schema.spec.external.http.ports[0]
           rules:
             - matches:
                 - path:

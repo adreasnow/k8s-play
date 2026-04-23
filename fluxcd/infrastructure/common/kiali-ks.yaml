@@ -15,5 +15,4 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: gateway-api
-    - name: istio
+    - name: kro-meshed-namespace

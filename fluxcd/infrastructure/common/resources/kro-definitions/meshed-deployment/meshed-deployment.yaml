@@ -12,12 +12,12 @@ spec:
       HTTPRoute:
         enabled: boolean
         ports: '[]integer | required=true'
-        paths: '[]string | default=["/"]'
+        path: string | default=/
 
       GRPCRoute:
         enabled: boolean
         ports: '[]integer | required=true'
-        paths: '[]string | default=["/"]'
+        path: string | default=/
 
       ContainerPort:
         port: integer | required=true

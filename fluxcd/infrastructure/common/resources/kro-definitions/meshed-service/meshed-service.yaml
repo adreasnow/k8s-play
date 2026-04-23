@@ -12,12 +12,12 @@ spec:
       HTTPRoute:
         enabled: boolean | default=false
         ports: '[]integer | required=true'
-        paths: '[]string | default=["/"]'
+        path: string | default=/
 
       GRPCRoute:
         enabled: boolean | default=false
         ports: '[]integer | required=true'
-        paths: '[]string | default=["/"]'
+        path: string | default=/
 
     spec:
       service: string | required=true
@@ -56,12 +56,10 @@ spec:
           hostnames:
             - ${schema.spec.hostname + "." + clusterVars.data.?domain.orValue("")}
           rules:
-            - matches: '${schema.spec.external.http.paths.map(p, {
-                "path": {
-                  "type": "PathPrefix",
-                  "value": p
-                  }
-                })}'
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: ${schema.spec.external.http.path}
               backendRefs: '${schema.spec.external.http.ports.map(p, {
                 "name": schema.spec.service,
                 "port": p
@@ -86,12 +84,10 @@ spec:
             "port": p
             })}'
           rules:
-            - matches: '${schema.spec.internal.http.paths.map(p, {
-                "path": {
-                  "type": "PathPrefix",
-                  "value": p
-                  }
-                })}'
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: ${schema.spec.internal.http.path}
               backendRefs: '${schema.spec.internal.http.ports.map(p, {
                 "name": schema.spec.service,
                 "port": p

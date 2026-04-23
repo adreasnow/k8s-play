@@ -4,3 +4,4 @@ metadata:
   name: telemetry
 spec:
   name: telemetry
+  podSecurity.enforce: privileged

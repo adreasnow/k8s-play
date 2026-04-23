@@ -10,6 +10,10 @@ spec:
     scope: Cluster
     spec:
       name: string | required=true
+      podSecurity:
+        enforce: string | default=baseline enum=privileged,baseline,restricted
+        warn: string | default=restricted enum=privileged,baseline,restricted
+        audit: string | default=restricted enum=privileged,baseline,restricted
 
   resources:
     - id: ns
@@ -21,9 +25,9 @@ spec:
           labels:
             istio.io/dataplane-mode: ambient
             istio.io/use-waypoint: waypoint
-            pod-security.kubernetes.io/enforce: baseline
-            pod-security.kubernetes.io/warn: restricted
-            pod-security.kubernetes.io/audit: restricted
+            pod-security.kubernetes.io/enforce: ${schema.spec.podSecurity.enforce}
+            pod-security.kubernetes.io/warn: ${schema.spec.podSecurity.warn}
+            pod-security.kubernetes.io/audit: ${schema.spec.podSecurity.audit}
 
     - id: enforceMTLS
       template:

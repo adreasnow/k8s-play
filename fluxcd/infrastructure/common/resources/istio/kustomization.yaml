@@ -7,3 +7,4 @@ resources:
   - 2-istiod.yaml
   - 3-cni.yaml
   - 4-ztunnel.yaml
+  - waypoint-config-map.yaml

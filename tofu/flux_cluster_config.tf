@@ -50,5 +50,6 @@ resource "kubernetes_config_map_v1" "cluster_vars" {
     domain                    = var.cluster_domain
     clusterName               = var.cluster_name
     namespaceRSIPTemplateName = local.namespace-rsip-template-name
+    azCount                   = "3"
   }
 }

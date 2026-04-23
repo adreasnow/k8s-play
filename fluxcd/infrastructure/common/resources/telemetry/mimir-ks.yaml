@@ -15,7 +15,7 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: telemetry-namespace
+    - name: telemetry-namespaces
   postBuild:
     substituteFrom:
       - kind: ConfigMap

@@ -16,7 +16,7 @@ spec:
     name: flux-system
   dependsOn:
     - name: otel-operator
-    - name: telemetry-namespace
+    - name: telemetry-namespaces
   postBuild:
     substituteFrom:
       - kind: ConfigMap

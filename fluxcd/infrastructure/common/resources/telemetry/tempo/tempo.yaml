@@ -14,7 +14,7 @@ spec:
         name: grafana-community
         namespace: flux-system
       interval: 1h
-  targetNamespace: telemetry
+  targetNamespace: tempo
   install:
     createNamespace: false
     remediation:
@@ -28,7 +28,7 @@ spec:
       name: tempo-values
       valuesKey: values
   values:
-    fullnameOverride: telemetry-tempo
+    fullnameOverride: tempo-tempo
     multitenancyEnabled: true
     tempo.tag: 2.10.4
 

@@ -2,9 +2,9 @@ apiVersion: bellroy.com/v1alpha1
 kind: MeshedService
 metadata:
   name: tempo
-  namespace: telemetry
+  namespace: tempo
 spec:
-  service: telemetry-tempo
+  service: tempo-tempo
   hostname: tempo.telemetry
   internal:
     http:

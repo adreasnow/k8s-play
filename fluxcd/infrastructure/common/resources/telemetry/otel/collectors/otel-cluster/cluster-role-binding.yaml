@@ -9,4 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: otel-collector-cluster
-    namespace: telemetry
+    namespace: otel

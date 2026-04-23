@@ -2,9 +2,9 @@ apiVersion: bellroy.com/v1alpha1
 kind: MeshedService
 metadata:
   name: loki
-  namespace: telemetry
+  namespace: loki
 spec:
-  service: telemetry-loki-gateway
+  service: loki-loki-gateway
   hostname: loki.telemetry
   internal:
     http:

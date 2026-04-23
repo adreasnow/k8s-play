@@ -20,7 +20,7 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-daemonset
-  namespace: telemetry
+  namespace: otel
 spec:
   mode: daemonset
   serviceAccount: otel-collector-daemonset
@@ -78,7 +78,7 @@ spec:
           - /var/log/pods/*/*/*.log
         exclude:
           # Don't collect our own logs
-          - /var/log/pods/telemetry_otel-daemonset-collector*/*/*.log
+          - /var/log/pods/otel_otel-daemonset-collector*/*/*.log
         start_at: end
         include_file_path: true
         include_file_name: false
@@ -176,7 +176,7 @@ spec:
       # Sends metrics via OTLP to Mimir's OTLP endpoint.
       # X-Scope-OrgID header is required for Mimir multi-tenancy.
       otlphttp/mimir:
-        endpoint: http://telemetry-mimir-gateway.mimir.svc.cluster.local:80/otlp
+        endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
         headers:
           X-Scope-OrgID: ${clusterName}
 
@@ -185,7 +185,7 @@ spec:
       # Loki accepts OTLP logs natively since v2.4+.
       # X-Scope-OrgID header is required for Loki multi-tenancy.
       otlphttp/loki:
-        endpoint: http://loki-gateway.loki.svc.cluster.local:80/otlp
+        endpoint: http://loki-loki-gateway.loki.svc.cluster.local:80/otlp
         headers:
           X-Scope-OrgID: ${clusterName}
 

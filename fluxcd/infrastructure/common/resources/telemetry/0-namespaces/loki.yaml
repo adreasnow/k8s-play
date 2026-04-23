@@ -1,0 +1,8 @@
+apiVersion: bellroy.com/v1alpha1
+kind: MeshedNamespace
+metadata:
+  name: loki
+spec:
+  name: loki
+  podSecurity:
+    enforce: privileged

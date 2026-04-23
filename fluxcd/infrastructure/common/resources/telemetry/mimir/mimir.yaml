@@ -14,7 +14,7 @@ spec:
         name: grafana
         namespace: flux-system
       interval: 1h
-  targetNamespace: telemetry
+  targetNamespace: mimir
   install:
     createNamespace: false
     remediation:
@@ -28,7 +28,7 @@ spec:
       name: mimir-values
       valuesKey: values
   values:
-    fullnameOverride: telemetry-mimir
+    fullnameOverride: mimir-mimir
     auth:
       multitenancy_enabled: true
     mimir:

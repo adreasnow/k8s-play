@@ -15,5 +15,5 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: telemetry-namespace
+    - name: telemetry-namespaces
     - name: mimir

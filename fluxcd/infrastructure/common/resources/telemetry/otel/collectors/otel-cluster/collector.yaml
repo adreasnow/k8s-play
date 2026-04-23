@@ -22,7 +22,7 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-cluster
-  namespace: telemetry
+  namespace: otel
 spec:
   mode: deployment
   replicas: 1
@@ -172,7 +172,7 @@ spec:
       # Sends all metrics via OTLP to Mimir's OTLP endpoint.
       # X-Scope-OrgID header is required for Mimir multi-tenancy.
       otlphttp/mimir:
-        endpoint: http://telemetry-mimir-gateway.mimir.svc.cluster.local:80/otlp
+        endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
         headers:
           X-Scope-OrgID: ${clusterName}
 

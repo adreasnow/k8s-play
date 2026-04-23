@@ -38,7 +38,7 @@ gateway:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 
 ingester:
   replicas: ${azCount}
@@ -50,7 +50,7 @@ ingester:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 
 querier:
   replicas: ${azCount} # Improve query performance via parallelism
@@ -61,7 +61,7 @@ querier:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 
 queryFrontend:
   replicas: 2
@@ -72,7 +72,7 @@ queryFrontend:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 
 queryScheduler:
   replicas: 2
@@ -82,7 +82,7 @@ queryScheduler:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 distributor:
   replicas: ${azCount}
   maxUnavailable: 1
@@ -92,7 +92,7 @@ distributor:
       whenUnsatisfiable: DoNotSchedule
       labelSelector:
         matchLabels:
-          app.kubernetes.io/name: telemetry-mimir
+          app.kubernetes.io/name: loki-loki
 
 compactor:
   replicas: 1

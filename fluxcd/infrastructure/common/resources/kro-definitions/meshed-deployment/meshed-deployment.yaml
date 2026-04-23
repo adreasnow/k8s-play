@@ -140,7 +140,7 @@ spec:
     - id: meshedService
       template:
         apiVersion: bellroy.com/v1alpha1
-        kind: Meshedservice
+        kind: MeshedService
         metadata:
           name: ${schema.spec.name}
         spec:

@@ -1,5 +1,5 @@
 deployment:
-  replicas: 3 # match the number of AZs
+  replicas: ${azCount} # match the number of AZs
 
 topologySpreadConstraints:
   - maxSkew: 1

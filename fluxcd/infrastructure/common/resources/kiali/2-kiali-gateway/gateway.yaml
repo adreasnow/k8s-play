@@ -1,7 +1,7 @@
 apiVersion: bellroy.com/v1alpha1
 kind: MeshedService
 metadata:
-  name: loki
+  name: kiali
 spec:
   service: kiali
   hostname: kiali.admin

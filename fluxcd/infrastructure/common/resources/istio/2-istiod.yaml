@@ -21,10 +21,12 @@ spec:
     cleanupOnFail: true
   values:
     profile: ambient
+    replicaCount: ${azCount}
     meshConfig:
       # Disallows plaintext ingress by meshed services
       outboundTrafficPolicy:
         mode: REGISTRY_ONLY
+    # Ensures istiod pods are spread across availability zones
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: topology.kubernetes.io/zone

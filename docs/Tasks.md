@@ -24,6 +24,11 @@ This destoys and re-creates the resources, so use with caution
 flux reconcile helmrelease linkerd-control-plane --force
 ```
 
+## Troubleshooting Kro issues
+
+1. Check the kro-system logs for errors; `kctl logs -n kro-system kro-system-kro-<pod index>`
+1. Check the status of the stuck resources; e.g. `kubectl describe -n telemetry meshedservices.bellroy.com tempo `
+
 ## To re-create a failed flux helm installed chart
 
 ```bash

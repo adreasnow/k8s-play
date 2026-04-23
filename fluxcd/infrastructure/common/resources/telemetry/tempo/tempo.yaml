@@ -24,12 +24,10 @@ spec:
     remediation:
       retries: 3
   values:
+    replicas: ${azCount}
     fullnameOverride: tempo-tempo
     multitenancyEnabled: true
     tempo.tag: 2.10.4
-
-    # TODO: service.trafficDistribution: PreferClose
-    # TODO: Topology spread constraints
 
     # storage:
     #   trace:
@@ -37,3 +35,29 @@ spec:
     #     s3:
     #       bucket: ${tempoBucketName}
     #       endpoint: s3.${awsRegion}.amazonaws.com
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: StatefulSet
+              name: tempo-tempo
+            patch: |
+              - op: add
+                path: /spec/template/spec/topologySpreadConstraints
+                value:
+                  - maxSkew: 1
+                    topologyKey: topology.kubernetes.io/zone
+                    whenUnsatisfiable: DoNotSchedule
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: tempo-tempo
+          - target:
+              version: v1
+              kind: Service
+              name: tempo-tempo
+            patch: |
+              - op: add
+                path: /spec/trafficDistribution
+                value: PreferClose

@@ -4,7 +4,7 @@ metadata:
   name: tempo
   namespace: telemetry
 spec:
-  service: telemetry-tempo-gateway
+  service: telemetry-tempo
   hostname: tempo.telemetry
   internal:
     http:

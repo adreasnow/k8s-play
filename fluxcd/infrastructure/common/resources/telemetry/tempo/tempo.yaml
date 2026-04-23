@@ -7,7 +7,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      chart: tempo-distributed
+      chart: tempo
       version: 2.0.0
       sourceRef:
         kind: HelmRepository
@@ -23,17 +23,14 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  valuesFrom:
-    - kind: ConfigMap
-      name: tempo-values
-      valuesKey: values
   values:
     fullnameOverride: tempo-tempo
     multitenancyEnabled: true
     tempo.tag: 2.10.4
 
-    # Swap these when S3 is available
-    minio.enabled: true
+    # TODO: service.trafficDistribution: PreferClose
+    # TODO: Topology spread constraints
+
     # storage:
     #   trace:
     #     backend: s3

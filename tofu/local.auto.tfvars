@@ -1,3 +1,4 @@
+aws_region     = "us-east-1"
 cluster_name   = "internal-staging"
 cluster_domain = "k8s.orb.local"
 

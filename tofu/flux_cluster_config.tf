@@ -51,5 +51,9 @@ resource "kubernetes_config_map_v1" "cluster_vars" {
     clusterName               = var.cluster_name
     namespaceRSIPTemplateName = local.namespace-rsip-template-name
     azCount                   = 2
+    awsRegion                 = var.aws_region
+    lokiBucketName            = "bellroy-loki-owlwayson"
+    tempoBucketName           = "bellroy-tempo-owlwayson"
+    mimirBucketName           = "bellroy-mimir-owlwayson"
   }
 }

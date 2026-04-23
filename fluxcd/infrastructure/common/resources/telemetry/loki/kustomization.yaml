@@ -3,3 +3,10 @@ kind: Kustomization
 resources:
   - loki.yaml
   - gateway.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: loki-values
+    namespace: flux-system
+    files:
+      - values=values-monolithic.yaml

@@ -24,7 +24,6 @@
 # MinIO is no longer enabled, and you are encouraged to use your cloud providers
 # object storage service such as S3 or GCS.
 
-minio.enabled: false
 kafka.enabled: false
 alertmanager.enabled: false
 overrides_exporter.enabled: false

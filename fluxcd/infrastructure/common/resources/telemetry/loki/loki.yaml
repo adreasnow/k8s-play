@@ -23,17 +23,21 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: loki-values
+      valuesKey: values
   values:
     fullname: telemetry-loki
     multitenancyEnabled: true
     replicas: ${azCount}
     loki.tag: 3.7.1
+
+    # Swap these when S3 is available
+    minio.enabled: true
     # storage:
-    #   trace:
-    #     backend: s3
-    #     s3:
-    #       bucket: bellroy-loki-owlwayson
-    #       endpoint: s3.us-east-1.amazonaws.com
+    #   type: s3
+    #   s3: s3://${awsRegion}/${lokiBucketName}
   postRenderers:
     - kustomize:
         patches:

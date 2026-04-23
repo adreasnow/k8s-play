@@ -31,9 +31,12 @@ spec:
     fullnameOverride: telemetry-tempo
     multitenancyEnabled: true
     tempo.tag: 2.10.4
+
+    # Swap these when S3 is available
+    minio.enabled: true
     # storage:
     #   trace:
     #     backend: s3
     #     s3:
-    #       bucket: bellroy-tempo-owlwayson
-    #       endpoint: s3.us-east-1.amazonaws.com
+    #       bucket: ${tempoBucketName}
+    #       endpoint: s3.${awsRegion}.amazonaws.com

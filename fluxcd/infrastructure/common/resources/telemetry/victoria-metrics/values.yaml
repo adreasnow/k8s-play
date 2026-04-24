@@ -1,0 +1,176 @@
+# ── Identity ──────────────────────────────────────────────────────────
+# Stamped on every metric so the query cluster knows which cluster it
+# came from. Populated by Flux ${clusterName} substitution.
+global:
+  clusterLabel: cluster
+
+vmagent:
+  spec:
+    externalLabels:
+      cluster: ${clusterName}
+    scrapeInterval: 30s
+    selectAllByDefault: true
+
+# ── Metrics storage (local per-cluster) ───────────────────────────────
+vmsingle:
+  enabled: true
+  spec:
+    retentionPeriod: "30d"
+    storage:
+      resources:
+        requests:
+          storage: 50Gi
+    # AZ-aware topology spread
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
+    extraArgs:
+      # Accept OTLP metrics from OTel collectors
+      opentelemetry.usePrometheusNaming: "true"
+
+# ── VMAuth: single gateway for both reads and writes ──────────────────
+# Write: OTel collectors → vmauth → vmsingle
+# Read:  Kiali + query cluster's federation → vmauth → vmsingle
+vmauth:
+  enabled: true
+  spec:
+    port: "8427"
+    service:
+      trafficDistribution: PreferClose
+    unauthorizedUserAccessSpec:
+      disabled: false
+      discover_backend_ips: true
+      url_map:
+        # Write path (OTLP, Prometheus remote write)
+        - src_paths:
+            - /api/v1/write
+            - /opentelemetry/.*
+            - /insert/.*
+          url_prefix:
+            - "{{ urlJoin (omit .vm.write \"path\") }}/"
+        # Read path (PromQL, Grafana, Kiali)
+        - src_paths:
+            - /api/v1/.*
+            - /prometheus/.*
+            - /select/.*
+            - /vmui/.*
+          url_prefix:
+            - "{{ urlJoin (omit .vm.read \"path\") }}/"
+
+# ── Kubernetes scraping (built-in) ────────────────────────────────────
+kubelet:
+  enabled: true
+kube-state-metrics:
+  enabled: true
+prometheus-node-exporter:
+  enabled: true
+kubeApiServer:
+  enabled: true
+coreDns:
+  enabled: true
+
+# ── Alerting ──────────────────────────────────────────────────────────
+vmalert:
+  enabled: true
+alertmanager:
+  enabled: true
+
+# ── Grafana: disabled on workers, runs on query cluster only ──────────
+grafana:
+  enabled: false
+
+# ── Logs (VictoriaLogs) and Traces (VictoriaTraces) ───────────────────
+# Deployed as raw CRDs via extraObjects since k8s-stack doesn't yet
+# include VL/VT natively (the vl-k8s-stack chart is still a draft PR).
+extraObjects:
+  - apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VLSingle
+    metadata:
+      name: vlogs
+      namespace: observability
+    spec:
+      retentionPeriod: "30d"
+      storage:
+        resources:
+          requests:
+            storage: 100Gi
+      service:
+        trafficDistribution: PreferClose
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+
+  - apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VLAgent
+    metadata:
+      name: vlagent
+      namespace: observability
+    spec:
+      # Collects pod logs from all nodes and ships to local VLSingle
+      remoteWrite:
+        - url: http://vlogs-vlsingle.observability.svc.cluster.local:9428/insert/jsonline
+
+  # VictoriaTraces — raw StatefulSet since no operator CRD exists yet
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: vtraces
+      namespace: observability
+    spec:
+      selector:
+        matchLabels:
+          app: vtraces
+      serviceName: vtraces
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: vtraces
+        spec:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: topology.kubernetes.io/zone
+              whenUnsatisfiable: ScheduleAnyway
+          containers:
+            - name: vtraces
+              image: victoriametrics/victoria-traces:v0.8.0
+              args:
+                - -retentionPeriod=14d
+                - -storageDataPath=/data
+              ports:
+                - containerPort: 10428
+                  name: http
+                - containerPort: 4317
+                  name: otlp-grpc
+                - containerPort: 4318
+                  name: otlp-http
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+      volumeClaimTemplates:
+        - metadata:
+            name: data
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 50Gi
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: vtraces
+      namespace: observability
+    spec:
+      selector:
+        app: vtraces
+      trafficDistribution: PreferClose
+      ports:
+        - name: http
+          port: 10428
+        - name: otlp-grpc
+          port: 4317
+        - name: otlp-http
+          port: 4318

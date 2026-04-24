@@ -1,0 +1,51 @@
+# Inherits all of worker-values.yaml, then overrides:
+
+# VMAuth on the query cluster fans out reads to ALL clusters.
+# Workers' vmauth endpoints are exposed via MeshedService external routes.
+vmauth:
+  enabled: true
+  spec:
+    unauthorizedUserAccessSpec:
+      url_map:
+        # Federated metrics read — merges results from all clusters
+        - src_paths:
+            - /api/v1/query.*
+            - /api/v1/series.*
+            - /api/v1/label.*
+            - /prometheus/.*
+            - /select/.*
+          url_prefix:
+            - https://vm.observability.${clusterA}.${domain}/
+            - https://vm.observability.${clusterB}.${domain}/
+            - https://vm.observability.${clusterC}.${domain}/
+            - https://vm.observability.${clusterD}.${domain}/
+            - "{{ urlJoin (omit .vm.read \"path\") }}/"  # local cluster
+        # Writes still go to local vmsingle only
+        - src_paths:
+            - /api/v1/write
+            - /opentelemetry/.*
+          url_prefix:
+            - "{{ urlJoin (omit .vm.write \"path\") }}/"
+
+# Grafana enabled only on the query cluster
+grafana:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+  # Datasources auto-wired to the local vmauth (which federates all clusters)
+  # k8s-stack auto-provisions the Victoriametrics datasource pointing at vmauth
+  additionalDataSources:
+    - name: VictoriaLogs
+      type: victoriametrics-logs-datasource
+      url: http://vlogs-vlsingle.observability.svc.cluster.local:9428
+      access: proxy
+      isDefault: false
+    - name: VictoriaTraces
+      type: jaeger
+      url: http://vtraces.observability.svc.cluster.local:10428/select/jaeger
+      access: proxy
+      isDefault: false
+  plugins:
+    - victoriametrics-metrics-datasource
+    - victoriametrics-logs-datasource

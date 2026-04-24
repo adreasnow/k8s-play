@@ -1,12 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - loki.yaml
+  - querier.yaml
   - gateway.yaml
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:
-  - name: loki-values
+  - name: victoriametrics-querier-values
     namespace: flux-system
     files:
-      - values=values-monolithic.yaml
+      - values=values.yaml

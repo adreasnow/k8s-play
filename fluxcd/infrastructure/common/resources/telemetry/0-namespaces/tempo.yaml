@@ -1,8 +1,0 @@
-apiVersion: bellroy.com/v1alpha1
-kind: MeshedNamespace
-metadata:
-  name: tempo
-spec:
-  name: tempo
-  podSecurity:
-    enforce: privileged

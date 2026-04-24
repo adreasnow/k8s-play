@@ -1,8 +1,6 @@
 apiVersion: bellroy.com/v1alpha1
 kind: MeshedNamespace
 metadata:
-  name: loki
+  name: victoriametrics
 spec:
-  name: loki
-  podSecurity:
-    enforce: privileged
+  name: victoriametrics

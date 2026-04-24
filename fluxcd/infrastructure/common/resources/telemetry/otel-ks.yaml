@@ -16,4 +16,4 @@ spec:
     name: flux-system
   dependsOn:
     - name: telemetry-namespaces
-    - name: mimir
+    - name: victoria-metrics

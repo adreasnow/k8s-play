@@ -6,7 +6,7 @@ resources:
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:
-  - name: victoriametrics-worker-values
+  - name: victoriametrics-values
     namespace: flux-system
     files:
       - values=values.yaml

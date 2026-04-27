@@ -6,6 +6,12 @@
 #   - ztunnel:       L4 ambient metrics (istio_tcp_*, connection metrics)
 #   - waypoint:      L7 Envoy metrics (istio_requests_*, istio_request/response_*, envoy_*)
 #
+# NOTE: metric_relabel_configs with __name__ does NOT work in the OTel Collector's
+# Prometheus receiver. The receiver converts Prometheus metrics to OTLP format before
+# relabeling runs, and __name__ is no longer a label in the OTLP data model — it becomes
+# the metric name field. Filtering on __name__ silently drops everything that doesn't
+# accidentally match. Use the OTel filter processor instead.
+#
 # References:
 #   - https://istio.io/latest/docs/ops/integrations/prometheus/
 #   - https://grafana.com/docs/mimir/latest/configure/configure-otel-collector/
@@ -42,11 +48,6 @@ spec:
                 - source_labels: [__meta_kubernetes_pod_container_port_name]
                   action: keep
                   regex: http-monitoring
-              metric_relabel_configs:
-                - source_labels: [__name__]
-                  action: keep
-                  regex: >-
-                    istio_build|pilot_info|pilot_proxy_convergence_time_sum|pilot_proxy_convergence_time_count|pilot_services|pilot_xds|pilot_xds_pushes|workload_manager_active_proxy_count|container_cpu_usage_seconds_total|container_memory_working_set_bytes|process_cpu_seconds_total|process_resident_memory_bytes
 
             # ── ztunnel (ambient L4 proxy) ────────────────────────────────
             # ztunnel runs as a DaemonSet and exposes L4 TCP metrics on port
@@ -69,11 +70,6 @@ spec:
                   target_label: __address__
                   regex: (.+)
                   replacement: "$1:15020"
-              metric_relabel_configs:
-                - source_labels: [__name__]
-                  action: keep
-                  regex: >-
-                    istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|istio_requests_total|istio_build|connection_opened|connection_closed
 
             # ── Waypoint proxies (ambient L7) ─────────────────────────────
             # Waypoint proxies are Envoy-based gateways that generate the full
@@ -95,17 +91,35 @@ spec:
                   target_label: __address__
                   regex: (.+)
                   replacement: "$1:15020"
-              metric_relabel_configs:
-                - source_labels: [__name__]
-                  action: keep
-                  regex: >-
-                    istio_requests_total|istio_request_duration_milliseconds_bucket|istio_request_duration_milliseconds_count|istio_request_duration_milliseconds_sum|istio_request_bytes_bucket|istio_request_bytes_count|istio_request_bytes_sum|istio_response_bytes_bucket|istio_response_bytes_count|istio_response_bytes_sum|istio_request_messages_total|istio_response_messages_total|istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|envoy_cluster_upstream_cx_active|envoy_cluster_upstream_rq_total|envoy_listener_downstream_cx_active|envoy_listener_http_downstream_rq|envoy_server_memory_allocated|envoy_server_memory_heap_size|envoy_server_uptime
 
     processors:
       memory_limiter:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 15
+      # Filter processor drops high-cardinality metrics that Kiali doesn't need.
+      # This replaces metric_relabel_configs which doesn't work in the OTel
+      # Prometheus receiver (see note at top of file).
+      filter:
+        error_mode: ignore
+        metrics:
+          metric:
+            - 'name == "scrape_duration_seconds"'
+            - 'name == "scrape_samples_scraped"'
+            - 'name == "scrape_samples_post_metric_relabeling"'
+            - 'name == "scrape_series_added"'
+            - 'name == "up"'
+            - 'name == "istio_dns_requests_total"'
+            - 'name == "istio_dns_upstream_requests_total"'
+            - 'name == "istio_dns_upstream_failures_total"'
+            - 'name == "istio_dns_upstream_request_duration_seconds"'
+            - 'name == "istio_xds_connection_terminations_total"'
+            - 'name == "istio_xds_message_total"'
+            - 'name == "istio_xds_message_bytes_total"'
+            - 'name == "workload_manager_active_proxy_count"'
+            - 'name == "workload_manager_pending_proxy_count"'
+            - 'name == "workload_manager_proxies_started_total"'
+            - 'name == "workload_manager_proxies_stopped_total"'
       batch:
         send_batch_size: 2048
         timeout: 5s
@@ -118,5 +132,5 @@ spec:
       pipelines:
         metrics:
           receivers: [prometheus]
-          processors: [memory_limiter, batch]
+          processors: [memory_limiter, filter, batch]
           exporters: [otlphttp]

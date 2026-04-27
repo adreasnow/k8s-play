@@ -2,9 +2,9 @@ apiVersion: bellroy.com/v1alpha1
 kind: MeshedService
 metadata:
   name: kiali
-  namespace: kiali-operator
+  namespace: istio-system
 spec:
-  service: kiali-operator
+  service: kiali
   hostname: kiali.admin
   internal:
     http:

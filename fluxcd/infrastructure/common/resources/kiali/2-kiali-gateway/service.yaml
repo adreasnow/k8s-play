@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kiali
+  name: kiali-operator
 spec:
   trafficDistribution: PreferClose # Prefer same AZ/same node endpoints (k8s)
   selector:
-    app: kiali
+    app: kiali-operator
   ports:
     - port: 20001
       targetPort: 20001

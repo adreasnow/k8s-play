@@ -4,7 +4,7 @@ metadata:
   name: kiali
   namespace: kiali-operator
 spec:
-  service: kiali
+  service: kiali-operator
   hostname: kiali.admin
   internal:
     http:

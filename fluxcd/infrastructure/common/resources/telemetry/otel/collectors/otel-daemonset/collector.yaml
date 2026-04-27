@@ -1,0 +1,202 @@
+# OpenTelemetry Collector — DaemonSet (per-node)
+#
+# Runs on every node to collect:
+#   - Kubelet stats: node/pod/container CPU, memory, filesystem, network metrics
+#   - Pod logs: stdout/stderr from all containers via /var/log/pods
+#
+# Both signals are enriched with Kubernetes metadata (namespace, pod, node, etc.)
+# via the k8sattributes processor and sent to Mimir (metrics) and Loki (logs).
+#
+# Must be DaemonSet because:
+#   - kubeletstats must query the local node's kubelet
+#   - filelog must read /var/log/pods from the host filesystem
+#
+# References:
+#   - https://opentelemetry.io/docs/kubernetes/collector/components/
+#   - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/kubeletstatsreceiver
+#   - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
+#   - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-daemonset
+  namespace: otel
+spec:
+  mode: daemonset
+  serviceAccount: otel-collector-daemonset
+
+  # ── Environment variables ────────────────────────────────────────────
+  # K8S_NODE_NAME: set via downward API so kubeletstats queries the local node
+  env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+
+  # ── Host volume mounts ───────────────────────────────────────────────
+  # Required by the filelog receiver to read pod container logs.
+  volumeMounts:
+    - name: varlogpods
+      mountPath: /var/log/pods
+      readOnly: true
+    - name: varlibdockercontainers
+      mountPath: /var/lib/docker/containers
+      readOnly: true
+
+  volumes:
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
+    - name: varlibdockercontainers
+      hostPath:
+        path: /var/lib/docker/containers
+
+  # ── Collector config ─────────────────────────────────────────────────
+  config:
+    receivers:
+      # ── Kubelet Stats Receiver ──────────────────────────────────────
+      # Pulls node, pod, and container resource metrics directly from the
+      # kubelet on each node. Provides CPU, memory, filesystem, and
+      # network metrics with proper k8s.* resource attributes.
+      kubeletstats:
+        collection_interval: 30s
+        auth_type: serviceAccount
+        endpoint: https://${env:K8S_NODE_NAME}:10250
+        insecure_skip_verify: true
+        metric_groups:
+          - node
+          - pod
+          - container
+          - volume
+
+      # ── Filelog Receiver ─────────────────────────────────────────────
+      # Tails CRI-format log files from /var/log/pods on the host.
+      # Parses the CRI log line format and extracts k8s metadata from the
+      # file path: /var/log/pods/<namespace>_<pod-name>_<pod-uid>/<container>/<restart-count>.log
+      filelog:
+        include:
+          - /var/log/pods/*/*/*.log
+        exclude:
+          # Don't collect our own logs
+          - /var/log/pods/otel_otel-daemonset-collector*/*/*.log
+        start_at: end
+        include_file_path: true
+        include_file_name: false
+        poll_interval: 500ms
+        operators:
+          # Parse CRI log format: <timestamp> <stream> <logtag> <log>
+          # https://kubernetes.io/docs/concepts/cluster-administration/logging/
+          - type: regex_parser
+            regex: '^(?P<time>\S+) (?P<stream>stdout|stderr) (?P<logtag>\w) (?P<log>.*)$'
+            timestamp:
+              parse_from: attributes.time
+              layout_type: strptime
+              layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+          # Move the log body from attribute to the log record body
+          - type: move
+            from: attributes.log
+            to: body
+          # Extract namespace, pod name, pod UID, container name from file path
+          # CRI path format: /var/log/pods/<namespace>_<pod-name>_<pod-uid>/<container>/<restart>.log
+          - type: regex_parser
+            regex: '/var/log/pods/(?P<namespace>[^_]+)_(?P<pod>[^_]+)_(?P<pod_uid>[^/]+)/(?P<container>[^/]+)/.*\.log'
+            parse_from: attributes["log.file.path"]
+          # Promote extracted fields to resource attributes
+          - type: move
+            from: attributes.namespace
+            to: resource["k8s.namespace.name"]
+          - type: move
+            from: attributes.pod
+            to: resource["k8s.pod.name"]
+          - type: move
+            from: attributes.pod_uid
+            to: resource["k8s.pod.uid"]
+          - type: move
+            from: attributes.container
+            to: resource["k8s.container.name"]
+          # Clean up intermediate attributes
+          - type: remove
+            field: attributes.time
+          - type: remove
+            field: attributes.stream
+            if: 'attributes.stream != nil'
+          - type: remove
+            field: attributes.logtag
+            if: 'attributes.logtag != nil'
+
+    processors:
+      # ── Kubernetes Attributes Processor ──────────────────────────────
+      # Enriches metrics and logs with k8s metadata by looking up the
+      # source pod IP. For DaemonSet collectors, the connection source IP
+      # is the actual pod IP (not a gateway/waypoint), so this works well.
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+          labels:
+            - tag_name: app
+              key: app
+              from: pod
+            - tag_name: app.kubernetes.io/name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: app.kubernetes.io/component
+              key: app.kubernetes.io/component
+              from: pod
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: connection
+
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+
+      batch:
+        send_batch_size: 2048
+        timeout: 5s
+
+    exporters:
+      # ── Mimir (metrics) ──────────────────────────────────────────────
+      # Sends metrics via OTLP to Mimir's OTLP endpoint.
+      # X-Scope-OrgID header is required for Mimir multi-tenancy.
+      otlphttp/mimir:
+        endpoint: http://mimir-mimir-gateway.mimir.svc.cluster.local:80/otlp
+        headers:
+          X-Scope-OrgID: ${clusterName}
+
+      # ── Loki (logs) ──────────────────────────────────────────────────
+      # Sends logs via OTLP to Loki's native OTLP endpoint.
+      # Loki accepts OTLP logs natively since v2.4+.
+      # X-Scope-OrgID header is required for Loki multi-tenancy.
+      otlphttp/loki:
+        endpoint: http://loki-loki-gateway.loki.svc.cluster.local:80/otlp
+        headers:
+          X-Scope-OrgID: ${clusterName}
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [kubeletstats]
+          processors: [k8sattributes, memory_limiter, batch]
+          exporters: [otlphttp/mimir]
+
+        logs:
+          receivers: [filelog]
+          processors: [k8sattributes, memory_limiter, batch]
+          exporters: [otlphttp/loki]

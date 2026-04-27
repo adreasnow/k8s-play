@@ -1,0 +1,118 @@
+# OpenTelemetry Collector that scrapes Istio ambient mesh metrics (istiod, ztunnel, waypoint proxies)
+# and pushes them to Mimir via OTLP for Kiali to consume.
+#
+# Metrics scraped:
+#   - istiod:        control plane metrics (pilot_*, istio_build)
+#   - ztunnel:       L4 ambient metrics (istio_tcp_*, connection metrics)
+#   - waypoint:      L7 Envoy metrics (istio_requests_*, istio_request/response_*, envoy_*)
+#
+# References:
+#   - https://istio.io/latest/docs/ops/integrations/prometheus/
+#   - https://grafana.com/docs/mimir/latest/configure/configure-otel-collector/
+#   - https://kiali.io/docs/faq/general/#requiredmetrics
+#   - https://ambientmesh.io/docs/observability/metrics/
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: istio-metrics
+  namespace: istio-system
+spec:
+  mode: deployment
+  serviceAccount: otel-collector-istio-metrics
+  config:
+    receivers:
+      prometheus:
+        config:
+          scrape_configs:
+            # ── Istiod control plane ──────────────────────────────────────
+            # Scrapes pilot_*, istio_build, and other control-plane metrics
+            # from the istiod service endpoints on the http-monitoring port.
+            - job_name: istiod
+              scrape_interval: 15s
+              kubernetes_sd_configs:
+                - role: endpoints
+                  namespaces:
+                    names:
+                      - istio-system
+              relabel_configs:
+                - source_labels:
+                    [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+                  action: keep
+                  regex: istiod;http-monitoring
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_build|pilot_info|pilot_proxy_convergence_time_sum|pilot_proxy_convergence_time_count|pilot_services|pilot_xds|pilot_xds_pushes|workload_manager_active_proxy_count|container_cpu_usage_seconds_total|container_memory_working_set_bytes|process_cpu_seconds_total|process_resident_memory_bytes
+
+            # ── ztunnel (ambient L4 proxy) ────────────────────────────────
+            # ztunnel runs as a DaemonSet and exposes L4 TCP metrics on port
+            # 15020 at /metrics. These include istio_tcp_* metrics that Kiali
+            # uses for TCP traffic visualisation.
+            - job_name: ztunnel
+              scrape_interval: 15s
+              metrics_path: /metrics
+              kubernetes_sd_configs:
+                - role: pod
+                  namespaces:
+                    names:
+                      - istio-system
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_app]
+                  action: keep
+                  regex: ztunnel
+                - source_labels: [__meta_kubernetes_pod_ip]
+                  action: replace
+                  target_label: __address__
+                  regex: (.+)
+                  replacement: "$$$$1:15020" # $$$$ -- flux post build --> $$  -- OTEL collector env var --> $
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|istio_requests_total|istio_build|connection_opened|connection_closed
+
+            # ── Waypoint proxies (ambient L7) ─────────────────────────────
+            # Waypoint proxies are Envoy-based gateways that generate the full
+            # set of Istio L7 metrics. They expose /stats/prometheus on port
+            # 15090. We discover them via the istio.io/gateway-name label which
+            # is present on all waypoint pods.
+            - job_name: waypoint-stats
+              scrape_interval: 15s
+              metrics_path: /stats/prometheus
+              kubernetes_sd_configs:
+                - role: pod
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_label_istio_io_gateway_name]
+                  action: keep
+                  regex: (.+)
+                - source_labels: [__meta_kubernetes_pod_ip]
+                  action: replace
+                  target_label: __address__
+                  regex: (.+)
+                  replacement: "$$$$1:15090"
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  action: keep
+                  regex: >-
+                    istio_requests_total|istio_request_duration_milliseconds_bucket|istio_request_duration_milliseconds_count|istio_request_duration_milliseconds_sum|istio_request_bytes_bucket|istio_request_bytes_count|istio_request_bytes_sum|istio_response_bytes_bucket|istio_response_bytes_count|istio_response_bytes_sum|istio_request_messages_total|istio_response_messages_total|istio_tcp_connections_closed_total|istio_tcp_connections_opened_total|istio_tcp_received_bytes_total|istio_tcp_sent_bytes_total|envoy_cluster_upstream_cx_active|envoy_cluster_upstream_rq_total|envoy_listener_downstream_cx_active|envoy_listener_http_downstream_rq|envoy_server_memory_allocated|envoy_server_memory_heap_size|envoy_server_uptime
+
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch:
+        send_batch_size: 2048
+        timeout: 5s
+
+    exporters:
+      otlphttp:
+        endpoint: http://victoriametrics-victoriametrics-vm-server.victoriametrics.svc.cluster.local:8428/opentelemetry
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp]

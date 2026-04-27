@@ -84,9 +84,6 @@ spec:
             "port": p,
             "sectionName": "port-" + string(p)
             })}'
-          hostnames:
-            - ${schema.spec.hostname + "." + clusterVars.data.?domain.orValue("")}
-            - ${schema.spec.hostname + ".cluster.local"}
           rules:
             - matches:
                 - path:

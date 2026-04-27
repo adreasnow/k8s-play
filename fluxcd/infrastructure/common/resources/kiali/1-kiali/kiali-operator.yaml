@@ -35,6 +35,6 @@ spec:
             gateway_api_classes_label_selector: "app.kubernetes.io/name=traefik"
           prometheus:
             # Prometheus service name is "metrics" and is in the "telemetry" namespace
-            url: http://telemetry-mimir-gateway.telemetry.svc.cluster.local:80/prometheus
+            url: http://victoriametrics-victoriametrics-vm-server.telemetry.svc.cluster.local
             custom_headers:
               X-Scope-OrgID: istio-${clusterName}

@@ -34,4 +34,4 @@ spec:
           istio:
             gateway_api_classes_label_selector: "app.kubernetes.io/name=traefik"
           prometheus:
-            url: https://victoriametrics-victoriametrics-vm-server.telemetry.svc.cluster.local
+            url: https://victoriametrics-victoriametrics-vm-server.telemetry.svc.cluster.local:8428

@@ -23,7 +23,28 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  valuesFrom:
-    - kind: ConfigMap
-      name: victoriametrics-values
-      valuesKey: values
+  values:
+    nameOverride: vm
+    server:
+      replicaCount: ${azCount}
+      persistentVolume:
+        enabled: true
+        size: 16Gi
+        # storageClassName: ebs-topology
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+
+      extraArgs:
+        dedup.minScrapeInterval: 30s
+        promscrape.cluster.membersCount: ${azCount}
+
+      # # Enterprise only
+      # vmbackupmanager:
+      #   # destination: "s3://"
+      #   enabled: true
+      #   restore.onStart.enabled: true
+
+      service:
+        trafficDistribution: PreferClose

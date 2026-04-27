@@ -3,10 +3,3 @@ kind: Kustomization
 resources:
   - victoriametrics.yaml
   - gateway.yaml
-generatorOptions:
-  disableNameSuffixHash: true
-configMapGenerator:
-  - name: victoriametrics-values
-    namespace: flux-system
-    files:
-      - values=values.yaml

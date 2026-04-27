@@ -4,13 +4,13 @@ metadata:
   name: victoriametrics
   namespace: victoriametrics
 spec:
-  service: victoriametrics
+  service: victoriametrics-victoriametrics-vm-server
   hostname: vm.telemetry
   internal:
     http:
       enabled: true
-      ports: [80]
+      ports: [8428]
   external:
     http:
       enabled: true
-      ports: [80]
+      ports: [8428]

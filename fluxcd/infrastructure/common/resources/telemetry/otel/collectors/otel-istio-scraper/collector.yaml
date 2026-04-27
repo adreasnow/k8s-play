@@ -1,5 +1,5 @@
 # OpenTelemetry Collector that scrapes Istio ambient mesh metrics (istiod, ztunnel, waypoint proxies)
-# and pushes them to Mimir via OTLP for Kiali to consume.
+# and pushes them to VictoriaMetrics via OTLP for Kiali to consume.
 #
 # Metrics scraped:
 #   - istiod:        control plane metrics (pilot_*, istio_build)
@@ -25,20 +25,23 @@ spec:
         config:
           scrape_configs:
             # ── Istiod control plane ──────────────────────────────────────
-            # Scrapes pilot_*, istio_build, and other control-plane metrics
-            # from the istiod service endpoints on the http-monitoring port.
+            # Scrapes pilot_*, istio_build, and other control-plane metrics.
+            # Uses role: pod instead of role: endpoints (deprecated in K8s 1.33+).
+            # Discovered via app=istiod label; port 15014 is http-monitoring.
             - job_name: istiod
               scrape_interval: 15s
               kubernetes_sd_configs:
-                - role: endpoints
+                - role: pod
                   namespaces:
                     names:
                       - istio-system
               relabel_configs:
-                - source_labels:
-                    [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+                - source_labels: [__meta_kubernetes_pod_label_app]
                   action: keep
-                  regex: istiod;http-monitoring
+                  regex: istiod
+                - source_labels: [__meta_kubernetes_pod_container_port_name]
+                  action: keep
+                  regex: http-monitoring
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -65,7 +68,7 @@ spec:
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$$$$1:15020" # $$$$ -- flux post build --> $$  -- OTEL collector env var --> $
+                  replacement: "$1:15020"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep
@@ -75,7 +78,8 @@ spec:
             # ── Waypoint proxies (ambient L7) ─────────────────────────────
             # Waypoint proxies are Envoy-based gateways that generate the full
             # set of Istio L7 metrics. They expose /stats/prometheus on port
-            # 15090. We discover them via the istio.io/gateway-name label which
+            # 15020 (the metrics port, per the prometheus.io/port annotation).
+            # Discovered via the istio.io/gateway-name=waypoint label which
             # is present on all waypoint pods.
             - job_name: waypoint-stats
               scrape_interval: 15s
@@ -85,12 +89,12 @@ spec:
               relabel_configs:
                 - source_labels: [__meta_kubernetes_pod_label_istio_io_gateway_name]
                   action: keep
-                  regex: (.+)
+                  regex: waypoint
                 - source_labels: [__meta_kubernetes_pod_ip]
                   action: replace
                   target_label: __address__
                   regex: (.+)
-                  replacement: "$$$$1:15090"
+                  replacement: "$1:15020"
               metric_relabel_configs:
                 - source_labels: [__name__]
                   action: keep

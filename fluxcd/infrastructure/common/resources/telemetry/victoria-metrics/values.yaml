@@ -16,8 +16,7 @@ server:
   vmbackupmanager:
     # destination: "s3://"
     enabled: true
-    restore:
-      onStart: true
+    restore.onStart.enabled: true
 
   service:
     trafficDistribution: PreferClose
